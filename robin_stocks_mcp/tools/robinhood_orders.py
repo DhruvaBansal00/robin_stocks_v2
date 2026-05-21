@@ -342,6 +342,34 @@ async def rh_order_sell_market(
 
 @mcp.tool()
 @safe_tool(write=True)
+async def rh_order_sell_tax_lot(
+    symbol: str,
+    lots: list[dict],
+    account_number: Optional[str] = None,
+    timeInForce: str = "gfd",
+    extendedHours: bool = False,
+    jsonify: bool = True,
+    market_hours: str = "regular_hours",
+) -> Any:
+    """Market SELL that closes specific open tax lots (the "Sell by Lot" flow).
+
+    `lots` is a list of dicts each with keys 'open_lot_id' and 'quantity'.
+    Lot ids come from rh_get_tax_lots(symbol).
+    """
+    return await to_thread(
+        rh.order_sell_tax_lot,
+        symbol,
+        lots,
+        account_number=account_number,
+        timeInForce=timeInForce,
+        extendedHours=extendedHours,
+        jsonify=jsonify,
+        market_hours=market_hours,
+    )
+
+
+@mcp.tool()
+@safe_tool(write=True)
 async def rh_order_sell_fractional_by_quantity(
     symbol: str,
     quantity: float,

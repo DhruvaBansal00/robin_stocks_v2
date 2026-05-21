@@ -54,6 +54,39 @@ async def rh_get_open_stock_positions(
 
 @mcp.tool()
 @safe_tool()
+async def rh_get_tax_lots(
+    symbol: str, account_number: Optional[str] = None, info: Optional[str] = None
+) -> Any:
+    """Return open tax lots for a given stock symbol (one entry per purchase still held)."""
+    return await to_thread(
+        rh.get_tax_lots, symbol, account_number=account_number, info=info
+    )
+
+
+@mcp.tool()
+@safe_tool()
+async def rh_get_selected_tax_lots(
+    order_id: str, account_number: Optional[str] = None, info: Optional[str] = None
+) -> Any:
+    """Return the open tax lots that were selected when placing a sell-by-lot order."""
+    return await to_thread(
+        rh.get_selected_tax_lots, order_id, account_number=account_number, info=info
+    )
+
+
+@mcp.tool()
+@safe_tool()
+async def rh_get_closed_tax_lots(
+    order_id: str, account_number: Optional[str] = None, info: Optional[str] = None
+) -> Any:
+    """Return closed (settled) tax lots for a sell order, with realized cost basis and term."""
+    return await to_thread(
+        rh.get_closed_tax_lots, order_id, account_number=account_number, info=info
+    )
+
+
+@mcp.tool()
+@safe_tool()
 async def rh_get_dividends(info: Optional[str] = None) -> Any:
     """Return a list of dividend transactions with rate, amount, shares, and date paid."""
     return await to_thread(rh.get_dividends, info=info)

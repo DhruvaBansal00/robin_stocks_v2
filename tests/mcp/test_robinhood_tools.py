@@ -76,6 +76,61 @@ async def test_rh_find_stock_orders_unpacks_filters() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Tax-lot tools: three read tools and one write tool
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_rh_get_tax_lots_dispatches() -> None:
+    with patch("robin_stocks.robinhood.get_tax_lots", return_value=[{"open_lot_id": "L1"}]) as m:
+        out = await get_fn("rh_get_tax_lots")(symbol="AAPL")
+        m.assert_called_once_with("AAPL", account_number=None, info=None)
+        assert out == [{"open_lot_id": "L1"}]
+
+
+@pytest.mark.asyncio
+async def test_rh_get_selected_tax_lots_dispatches() -> None:
+    with patch("robin_stocks.robinhood.get_selected_tax_lots", return_value=[]) as m:
+        await get_fn("rh_get_selected_tax_lots")(order_id="ord-1", account_number="acct-9")
+        m.assert_called_once_with("ord-1", account_number="acct-9", info=None)
+
+
+@pytest.mark.asyncio
+async def test_rh_get_closed_tax_lots_dispatches() -> None:
+    with patch("robin_stocks.robinhood.get_closed_tax_lots", return_value=[]) as m:
+        await get_fn("rh_get_closed_tax_lots")(order_id="ord-2", info="term")
+        m.assert_called_once_with("ord-2", account_number=None, info="term")
+
+
+@pytest.mark.asyncio
+async def test_rh_order_sell_tax_lot_blocked_when_read_only(writes_disabled) -> None:
+    with patch("robin_stocks.robinhood.order_sell_tax_lot") as m:
+        out = await get_fn("rh_order_sell_tax_lot")(
+            symbol="AAPL", lots=[{"open_lot_id": "L1", "quantity": "1"}]
+        )
+        assert out["error"] is True
+        assert out["type"] == "ReadOnlyError"
+        m.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_rh_order_sell_tax_lot_dispatches_when_writes_enabled(writes_enabled) -> None:
+    lots = [{"open_lot_id": "L1", "quantity": "1"}, {"open_lot_id": "L2", "quantity": "2"}]
+    with patch("robin_stocks.robinhood.order_sell_tax_lot", return_value={"id": "abc"}) as m:
+        out = await get_fn("rh_order_sell_tax_lot")(symbol="AAPL", lots=lots)
+        m.assert_called_once_with(
+            "AAPL",
+            lots,
+            account_number=None,
+            timeInForce="gfd",
+            extendedHours=False,
+            jsonify=True,
+            market_hours="regular_hours",
+        )
+        assert out == {"id": "abc"}
+
+
+# ---------------------------------------------------------------------------
 # Write-tool dispatch + read-only enforcement
 # ---------------------------------------------------------------------------
 
