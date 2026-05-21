@@ -75,16 +75,20 @@ def get_all_open_stock_orders(info=None, account_number=None):
 
 
 @login_required
-def get_all_open_option_orders(info=None, account_number=None):
+def get_all_open_option_orders(info=None, account_number=None, start_date=None):
     """Returns a list of all the orders that are currently open.
 
     :param info: Will filter the results to get a specific value.
     :type info: Optional[str]
+    :param account_number: the robinhood account number.
+    :type account_number: Optional[str]
+    :param start_date: Filter to orders created at or after this date (YYYY-MM-DD).
+    :type start_date: Optional[str]
     :returns: Returns a list of dictionaries of key/value pairs for each order. If info parameter is provided, \
     a list of strings is returned where the strings are the value of the key that matches info.
 
     """
-    url = option_orders_url(account_number=account_number)
+    url = option_orders_url(account_number=account_number, start_date=start_date)
     data = request_get(url, 'pagination')
 
     data = [item for item in data if item['cancel_url'] is not None]

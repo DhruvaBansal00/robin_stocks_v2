@@ -59,10 +59,17 @@ async def rh_get_all_open_stock_orders(
 @mcp.tool()
 @safe_tool()
 async def rh_get_all_open_option_orders(
-    info: Optional[str] = None, account_number: Optional[str] = None
+    info: Optional[str] = None,
+    account_number: Optional[str] = None,
+    start_date: Optional[str] = None,
 ) -> Any:
-    """All currently-open option orders."""
-    return await to_thread(rh.get_all_open_option_orders, info=info, account_number=account_number)
+    """All currently-open option orders. `start_date` filters to orders at/after YYYY-MM-DD."""
+    return await to_thread(
+        rh.get_all_open_option_orders,
+        info=info,
+        account_number=account_number,
+        start_date=start_date,
+    )
 
 
 @mcp.tool()
