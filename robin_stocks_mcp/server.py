@@ -28,6 +28,7 @@ def _register_all_tools() -> None:
         robinhood_futures,
         robinhood_markets,
         robinhood_orders,
+        robinhood_recurring,
         robinhood_export,
         tda_auth,
         tda_account,

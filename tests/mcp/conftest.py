@@ -25,6 +25,7 @@ def _import_all_tool_modules() -> None:
         robinhood_futures,
         robinhood_markets,
         robinhood_orders,
+        robinhood_recurring,
         robinhood_export,
         tda_auth,
         tda_account,
