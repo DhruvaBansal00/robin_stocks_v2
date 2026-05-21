@@ -565,6 +565,9 @@ def order_sell_tax_lot(symbol, lots, account_number=None, timeInForce='gfd', ext
         print("ERROR: lots list cannot be empty.", file=get_output())
         return None
 
+    if extendedHours and market_hours == 'regular_hours':
+        market_hours = 'extended_hours'
+
     from decimal import Decimal
     normalized_lots = []
     total_quantity = Decimal('0')
@@ -906,6 +909,9 @@ def order(symbol, quantity, side, limitPrice=None, stopPrice=None, account_numbe
     else:
         priceType = "bid_price"
 
+    if extendedHours and market_hours == 'regular_hours':
+        market_hours = 'extended_hours'
+
     if limitPrice and stopPrice:
         price = round_price(limitPrice)
         stopPrice = round_price(stopPrice)
@@ -940,7 +946,7 @@ def order(symbol, quantity, side, limitPrice=None, stopPrice=None, account_numbe
         'time_in_force': timeInForce,
         'trigger': trigger,
         'side': side,
-        'market_hours': market_hours, # choices are ['regular_hours', 'all_day_hours', 'extended_hours']
+        'market_hours': market_hours,
         'extended_hours': extendedHours,
         'order_form_version': 4
     }
@@ -948,9 +954,8 @@ def order(symbol, quantity, side, limitPrice=None, stopPrice=None, account_numbe
     if orderType == 'market':
         if trigger != "stop":
             del payload['stop_price']
-        # if market_hours == 'regular_hours': 
-        #     del payload['extended_hours'] 
-        
+
+
     if market_hours == 'regular_hours':
         if side == "buy":
             payload['preset_percent_limit'] = "0.05"
