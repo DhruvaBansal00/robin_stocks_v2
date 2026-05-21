@@ -152,6 +152,44 @@ async def test_rh_order_sell_tax_lot_dispatches_when_writes_enabled(writes_enabl
 
 
 @pytest.mark.asyncio
+async def test_rh_order_sell_option_limit_by_id_blocked_when_read_only(writes_disabled) -> None:
+    with patch("robin_stocks.robinhood.order_sell_option_limit_by_id") as m:
+        out = await get_fn("rh_order_sell_option_limit_by_id")(
+            positionEffect="close",
+            creditOrDebit="credit",
+            price=1.00,
+            quantity=1,
+            optionID="opt-1",
+        )
+        assert out["error"] is True
+        assert out["type"] == "ReadOnlyError"
+        m.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_rh_order_sell_option_limit_by_id_dispatches_when_writes_enabled(writes_enabled) -> None:
+    with patch("robin_stocks.robinhood.order_sell_option_limit_by_id", return_value={"id": "ord"}) as m:
+        out = await get_fn("rh_order_sell_option_limit_by_id")(
+            positionEffect="close",
+            creditOrDebit="credit",
+            price=1.00,
+            quantity=1,
+            optionID="opt-1",
+        )
+        m.assert_called_once_with(
+            "close",
+            "credit",
+            1.00,
+            1,
+            "opt-1",
+            account_number=None,
+            timeInForce="gtc",
+            jsonify=True,
+        )
+        assert out == {"id": "ord"}
+
+
+@pytest.mark.asyncio
 async def test_rh_order_buy_market_blocked_when_read_only(writes_disabled) -> None:
     with patch("robin_stocks.robinhood.order_buy_market") as m:
         out = await get_fn("rh_order_buy_market")(symbol="AAPL", quantity=1)

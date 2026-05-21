@@ -64,6 +64,7 @@ from .orders import (cancel_all_crypto_orders, cancel_all_option_orders,
                      order_sell_fractional_by_price,
                      order_sell_fractional_by_quantity, order_sell_limit,
                      order_sell_market, order_sell_option_limit,
+                     order_sell_option_limit_by_id,
                      order_sell_option_stop_limit, order_sell_stop_limit,
                      order_sell_stop_loss, order_sell_tax_lot,
                      order_sell_trailing_stop)
