@@ -142,6 +142,13 @@ async def rh_get_stock_quote_by_id(stock_id: str, info: Optional[str] = None) ->
 
 @mcp.tool()
 @safe_tool()
+async def rh_get_index_quote_by_id(stock_id: str, info: Optional[str] = None) -> Any:
+    """Quote info for an index-option underlying (SPX, NDX, etc.) by Robinhood index id."""
+    return await to_thread(rh.get_index_quote_by_id, stock_id, info=info)
+
+
+@mcp.tool()
+@safe_tool()
 async def rh_get_stock_quote_by_symbol(symbol: str, info: Optional[str] = None) -> Any:
     """Quote info for a single stock by ticker symbol."""
     return await to_thread(rh.get_stock_quote_by_symbol, symbol, info=info)

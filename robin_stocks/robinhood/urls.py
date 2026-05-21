@@ -268,6 +268,10 @@ def marketdata_options_url():
 # pricebook
 
 
+def marketdata_index_quotes_url(id):
+    return ('https://api.robinhood.com/marketdata/indexes/values/v1/{0}/'.format(id))
+
+
 def marketdata_quotes_url(id):
     return ('https://api.robinhood.com/marketdata/quotes/{0}/'.format(id))
 

@@ -68,6 +68,14 @@ async def test_rh_get_open_crypto_positions_dispatches() -> None:
 
 
 @pytest.mark.asyncio
+async def test_rh_get_index_quote_by_id_dispatches() -> None:
+    with patch("robin_stocks.robinhood.get_index_quote_by_id", return_value={"last_trade_price": "100"}) as m:
+        out = await get_fn("rh_get_index_quote_by_id")(stock_id="abc")
+        m.assert_called_once_with("abc", info=None)
+        assert out == {"last_trade_price": "100"}
+
+
+@pytest.mark.asyncio
 async def test_rh_find_tradable_options_dispatches() -> None:
     with patch("robin_stocks.robinhood.find_tradable_options", return_value=[]) as m:
         await get_fn("rh_find_tradable_options")(symbol="AAPL", expirationDate="2026-06-19")

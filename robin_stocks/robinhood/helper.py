@@ -5,6 +5,10 @@ from functools import wraps
 import requests
 from robin_stocks.robinhood.globals import LOGGED_IN, OUTPUT, SESSION
 
+# Index-option underlying tickers. These resolve through /indexes/ instead of
+# /instruments/, and their option chains carry suffixed chain_symbols.
+INDEX_OPT_SYMBOLS = ('SPX', 'NDX', 'VIX', 'RUT', 'XSP')
+
 
 def set_login_state(logged_in):
     """Sets the login state"""
@@ -60,7 +64,10 @@ def id_for_stock(symbol):
         print(message, file=get_output())
         return(None)
 
-    url = 'https://api.robinhood.com/instruments/'
+    if symbol in INDEX_OPT_SYMBOLS:
+        url = 'https://api.robinhood.com/indexes/'
+    else:
+        url = 'https://api.robinhood.com/instruments/'
     payload = {'symbol': symbol}
     data = request_get(url, 'indexzero', payload)
 
@@ -81,15 +88,26 @@ def id_for_chain(symbol):
         print(message, file=get_output())
         return(None)
 
-    url = 'https://api.robinhood.com/instruments/'
+    if symbol in INDEX_OPT_SYMBOLS:
+        url = 'https://api.robinhood.com/indexes/'
+    else:
+        url = 'https://api.robinhood.com/instruments/'
 
     payload = {'symbol': symbol}
     data = request_get(url, 'indexzero', payload)
 
-    if data:
-        return(data['tradable_chain_id'])
-    else:
+    if not data:
         return(data)
+
+    if symbol in INDEX_OPT_SYMBOLS:
+        # Index symbols return multiple tradable chains; pick the appropriate one.
+        # Index options resolve to a sorted list of tradable_chain_ids; the
+        # weekly/PM-settled chain is at the end for XSP but at the front for
+        # the rest of the indices.
+        sorted_chain_ids = sorted(data['tradable_chain_ids'])
+        idx = -1 if symbol == 'XSP' else 0
+        return(sorted_chain_ids[idx])
+    return(data['tradable_chain_id'])
 
 
 def id_for_group(symbol):

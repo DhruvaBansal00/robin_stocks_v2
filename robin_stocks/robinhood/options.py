@@ -3,6 +3,17 @@ import sys
 from robin_stocks.robinhood.helper import *
 from robin_stocks.robinhood.urls import *
 
+# Per-symbol overrides for the chain_symbol used when querying option chains
+# for index options. Robinhood publishes the weekly/PM-settled chains under
+# slightly different symbols than the underlying index.
+_INDEX_CHAIN_SYMBOL_SUFFIX = {'NDX': 'P', 'SPX': 'W', 'RUT': 'W', 'VIX': 'W'}
+
+
+def _index_chain_symbol(symbol):
+    suffix = _INDEX_CHAIN_SYMBOL_SUFFIX.get(symbol)
+    return symbol + suffix if suffix else symbol
+
+
 def spinning_cursor():
     """ This is a generator function to yield a character. """
     while True:
@@ -151,8 +162,9 @@ def find_tradable_options(symbol, expirationDate=None, strikePrice=None, optionT
         print("Symbol {} is not valid for finding options.".format(symbol), file=get_output())
         return [None]
 
+    chain_symbol = _index_chain_symbol(symbol)
     payload = {'chain_id': id_for_chain(symbol),
-               'chain_symbol': symbol,
+               'chain_symbol': chain_symbol,
                'state': 'active'}
 
     if expirationDate:

@@ -585,6 +585,21 @@ def get_stock_historicals(inputSymbols, interval='hour', span='week', bounds='re
     return(filter_data(histData, info))
 
 
+def get_index_quote_by_id(stock_id, info=None):
+    """Returns a market-data quote for an index option underlying (SPX, NDX, etc.).
+
+    :param stock_id: Robinhood index id (resolve via id_for_stock for index symbols).
+    :type stock_id: str
+    :param info: Will filter the results to get a specific value.
+    :type info: Optional[str]
+    :return: [dict] If the info parameter is provided, then the function will extract the value of the key \
+    that matches the info parameter. Otherwise, the whole dictionary is returned.
+    """
+    url = marketdata_index_quotes_url(stock_id)
+    data = request_get(url)
+    return (filter_data(data, info))
+
+
 def get_stock_quote_by_id(stock_id, info=None):
     """
     Represents basic stock quote information
@@ -645,7 +660,8 @@ def get_stock_quote_by_symbol(symbol, info=None):
                       * updated_at
                       * instrument
     """
-
+    if symbol in INDEX_OPT_SYMBOLS:
+        return get_index_quote_by_id(id_for_stock(symbol))
     return get_stock_quote_by_id(id_for_stock(symbol))
 
 
