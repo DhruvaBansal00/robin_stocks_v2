@@ -25,6 +25,7 @@ def _register_all_tools() -> None:
         robinhood_stocks,
         robinhood_options,
         robinhood_crypto,
+        robinhood_futures,
         robinhood_markets,
         robinhood_orders,
         robinhood_export,
