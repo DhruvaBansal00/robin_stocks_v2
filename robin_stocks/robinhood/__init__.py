@@ -18,7 +18,8 @@ from .account import (build_holdings, build_user_profile,
                       withdrawl_funds_to_bank_account)
 from .authentication import login, logout
 from .crypto import (get_crypto_currency_pairs, get_crypto_historicals,
-                     get_crypto_info, get_crypto_positions, get_crypto_quote,
+                     get_crypto_info, get_crypto_positions,
+                     get_open_crypto_positions, get_crypto_quote,
                      get_crypto_quote_from_id, load_crypto_profile)
 from .export import (export_completed_crypto_orders,
                      export_completed_option_orders,

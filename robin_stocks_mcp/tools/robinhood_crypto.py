@@ -26,6 +26,13 @@ async def rh_get_crypto_positions(info: Optional[str] = None) -> Any:
 
 @mcp.tool()
 @safe_tool()
+async def rh_get_open_crypto_positions(info: Optional[str] = None) -> Any:
+    """Open crypto positions for the account (filters out zero-quantity holdings)."""
+    return await to_thread(rh.get_open_crypto_positions, info=info)
+
+
+@mcp.tool()
+@safe_tool()
 async def rh_get_crypto_currency_pairs(info: Optional[str] = None) -> Any:
     """All crypto currency pairs available for trading."""
     return await to_thread(rh.get_crypto_currency_pairs, info=info)
