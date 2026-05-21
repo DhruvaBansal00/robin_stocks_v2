@@ -1,6 +1,6 @@
 import getpass
 import os
-import pickle
+import json
 import secrets
 import time
 from robin_stocks.robinhood.helper import *
@@ -134,7 +134,7 @@ def login(username=None, password=None, expiresIn=86400, scope='internal', store
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
 
-    creds_file = "robinhood" + pickle_name + ".pickle"
+    creds_file = "robinhood" + pickle_name + ".json"
     pickle_path = os.path.join(data_dir, creds_file)
 
     url = login_url()
@@ -153,13 +153,13 @@ def login(username=None, password=None, expiresIn=86400, scope='internal', store
 
     if mfa_code:
         login_payload['mfa_code'] = mfa_code
-    # If authentication has been stored in pickle file then load it. Stops login server from being pinged so much.
+    # If authentication has been stored in session file then load it. Stops login server from being pinged so much.
     if os.path.isfile(pickle_path):
-        # **Load cached authentication session if available**
+        # Load cached authentication session if available
         if store_session:
             try:
-                with open(pickle_path, 'rb') as f:
-                    pickle_data = pickle.load(f)
+                with open(pickle_path, 'r') as f:
+                    pickle_data = json.load(f)
                     access_token = pickle_data['access_token']
                     token_type = pickle_data['token_type']
                     refresh_token = pickle_data['refresh_token']
@@ -174,12 +174,12 @@ def login(username=None, password=None, expiresIn=86400, scope='internal', store
                     # Raises exception if response code is not 200.
                     res.raise_for_status()
                     return({'access_token': access_token, 'token_type': token_type,
-                            'expires_in': expiresIn, 'scope': scope, 
+                            'expires_in': expiresIn, 'scope': scope,
                             'detail': 'logged in using authentication in {0}'.format(creds_file),
                             'backup_code': None, 'refresh_token': refresh_token})
             except Exception:
                     print(
-                        "ERROR: There was an issue loading pickle file. Authentication may be expired - logging in normally.", file=get_output())
+                        "ERROR: There was an issue loading session file. Authentication may be expired - logging in normally.", file=get_output())
                     set_login_state(False)
                     update_session('Authorization', None)
         else:
@@ -211,11 +211,11 @@ def login(username=None, password=None, expiresIn=86400, scope='internal', store
                 set_login_state(True)
 
             if store_session:
-                with open(pickle_path, 'wb') as f:
-                    pickle.dump({'token_type': data['token_type'],
+                with open(pickle_path, 'w') as f:
+                    json.dump({'token_type': data['token_type'],
                                  'access_token': data['access_token'],
                                  'refresh_token': data['refresh_token'],
-                                 'device_token': login_payload['device_token']}, f)
+                                 'device_token': login_payload['device_token']}, f, indent=2)
 
             return data
 

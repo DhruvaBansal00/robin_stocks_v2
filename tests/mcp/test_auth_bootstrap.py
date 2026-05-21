@@ -1,15 +1,15 @@
 """Tests for the auth bootstrap.
 
 Order of preference at startup:
-  1. SDK-persisted session (Robinhood pickle / TDA encrypted store)
+  1. SDK-persisted session (Robinhood JSON / TDA encrypted store)
   2. Env-supplied credentials
   3. No-op + helpful log message
 """
 
 from __future__ import annotations
 
+import json
 import os
-import pickle
 from unittest.mock import MagicMock, patch
 
 from robin_stocks_mcp.auth import (
@@ -39,20 +39,20 @@ def _cfg(**overrides) -> Config:
 
 
 # ---------------------------------------------------------------------------
-# Pickle-reuse path (the primary, recommended flow)
+# Session-reuse path (the primary, recommended flow)
 # ---------------------------------------------------------------------------
 
 
-def test_try_reuse_returns_false_when_no_pickle(tmp_path) -> None:
+def test_try_reuse_returns_false_when_no_session_file(tmp_path) -> None:
     cfg = _cfg(rh_pickle_path=str(tmp_path))
     assert try_reuse_robinhood_session(cfg) is False
 
 
-def test_try_reuse_loads_pickle_and_probes_api(tmp_path) -> None:
+def test_try_reuse_loads_session_and_probes_api(tmp_path) -> None:
     cfg = _cfg(rh_pickle_path=str(tmp_path))
-    pickle_path = _robinhood_pickle_path(cfg)
-    with open(pickle_path, "wb") as f:
-        pickle.dump(
+    session_path = _robinhood_pickle_path(cfg)
+    with open(session_path, "w") as f:
+        json.dump(
             {
                 "token_type": "Bearer",
                 "access_token": "tok-123",
@@ -78,9 +78,9 @@ def test_try_reuse_loads_pickle_and_probes_api(tmp_path) -> None:
 
 def test_try_reuse_returns_false_on_invalid_token(tmp_path) -> None:
     cfg = _cfg(rh_pickle_path=str(tmp_path))
-    pickle_path = _robinhood_pickle_path(cfg)
-    with open(pickle_path, "wb") as f:
-        pickle.dump(
+    session_path = _robinhood_pickle_path(cfg)
+    with open(session_path, "w") as f:
+        json.dump(
             {
                 "token_type": "Bearer",
                 "access_token": "expired",
@@ -101,7 +101,23 @@ def test_try_reuse_returns_false_on_invalid_token(tmp_path) -> None:
     assert ok is False
 
 
-def test_bootstrap_prefers_pickle_over_env_creds(tmp_path) -> None:
+def test_try_reuse_returns_false_on_corrupt_session_file(tmp_path) -> None:
+    """A non-JSON or malformed session file must not break the bootstrap."""
+    cfg = _cfg(rh_pickle_path=str(tmp_path))
+    session_path = _robinhood_pickle_path(cfg)
+    with open(session_path, "w") as f:
+        f.write("not valid json {")
+
+    with patch("robin_stocks_mcp.auth.request_get") as probe, \
+         patch("robin_stocks_mcp.auth.update_session"), \
+         patch("robin_stocks_mcp.auth.set_login_state"):
+        ok = try_reuse_robinhood_session(cfg)
+
+    assert ok is False
+    probe.assert_not_called()
+
+
+def test_bootstrap_prefers_session_over_env_creds(tmp_path) -> None:
     cfg = _cfg(
         rh_pickle_path=str(tmp_path),
         rh_username="from-env",
@@ -113,7 +129,7 @@ def test_bootstrap_prefers_pickle_over_env_creds(tmp_path) -> None:
         bootstrap_login(cfg)
 
     reuse.assert_called_once()
-    # Env creds must NOT be used when the pickle works.
+    # Env creds must NOT be used when the cached session works.
     rh_login.assert_not_called()
 
 
@@ -122,7 +138,7 @@ def test_bootstrap_prefers_pickle_over_env_creds(tmp_path) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_bootstrap_falls_back_to_env_creds_when_pickle_missing() -> None:
+def test_bootstrap_falls_back_to_env_creds_when_session_missing() -> None:
     cfg = _cfg(rh_username="u", rh_password="p", rh_mfa_code="123456")
     with patch(
         "robin_stocks_mcp.auth.try_reuse_robinhood_session", return_value=False

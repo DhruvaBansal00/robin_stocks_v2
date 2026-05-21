@@ -55,14 +55,14 @@ def _cmd_serve(args: argparse.Namespace) -> int:
 
 
 def _cmd_login(args: argparse.Namespace) -> int:
-    """Interactive Robinhood first-time login. Writes the session pickle to disk."""
+    """Interactive Robinhood first-time login. Writes the session file to disk."""
     print("Robinhood interactive login. Credentials are not stored in plaintext —")
-    print("only the resulting session token is pickled under ~/.tokens/.")
+    print("only the resulting session token is written under ~/.tokens/.")
     username = args.username or input("Robinhood username: ").strip()
     password = args.password or getpass.getpass("Robinhood password: ")
     mfa = args.mfa_code  # may be None; the SDK will prompt during login if needed
     rh.login(username=username, password=password, mfa_code=mfa, store_session=True)
-    print("Login complete; pickle written. Future `robin-stocks-mcp` runs will reuse it.")
+    print("Login complete; session file written. Future `robin-stocks-mcp` runs will reuse it.")
     return 0
 
 
@@ -115,7 +115,7 @@ def _build_parser() -> argparse.ArgumentParser:
     serve.set_defaults(func=_cmd_serve)
 
     login_p = sub.add_parser(
-        "login", help="Interactive first-time Robinhood login (seeds the pickle)."
+        "login", help="Interactive first-time Robinhood login (seeds the session file)."
     )
     login_p.add_argument("--username")
     login_p.add_argument("--password")

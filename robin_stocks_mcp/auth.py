@@ -2,9 +2,9 @@
 
 Design: lean on the credential persistence each broker SDK already ships with.
 
-- **Robinhood** stores a session pickle at ``~/.tokens/robinhood.pickle`` after the
+- **Robinhood** stores a session JSON at ``~/.tokens/robinhood.json`` after the
   first interactive login. We reuse it directly — no creds required at startup.
-  If the pickle is missing or expired, we surface a clear message instead of
+  If the file is missing or expired, we surface a clear message instead of
   prompting (which would block STDIO).
 - **TD Ameritrade** stores credentials encrypted with a passcode. We just need
   the passcode to unlock them; pass it via ``TDA_ENCRYPTION_PASSCODE`` or call
@@ -18,8 +18,8 @@ deployments (CI, containers), but they are not the default path.
 
 from __future__ import annotations
 
+import json
 import os
-import pickle
 import sys
 from typing import Optional
 
@@ -57,11 +57,11 @@ def _resolve_mfa(value: Optional[str]) -> Optional[str]:
 def _robinhood_pickle_path(cfg: Config) -> str:
     base = cfg.rh_pickle_path or os.path.join(os.path.expanduser("~"), ".tokens")
     name = cfg.rh_pickle_name or ""
-    return os.path.join(base, f"robinhood{name}.pickle")
+    return os.path.join(base, f"robinhood{name}.json")
 
 
 def try_reuse_robinhood_session(cfg: Config) -> bool:
-    """Load the persisted Robinhood session pickle without falling back to ``input()``.
+    """Load the persisted Robinhood session JSON without falling back to ``input()``.
 
     Returns True iff the cached token is present and the server accepts it.
     """
@@ -69,8 +69,8 @@ def try_reuse_robinhood_session(cfg: Config) -> bool:
     if not os.path.isfile(pickle_path):
         return False
     try:
-        with open(pickle_path, "rb") as f:
-            data = pickle.load(f)
+        with open(pickle_path, "r") as f:
+            data = json.load(f)
         token_type = data["token_type"]
         access_token = data["access_token"]
         update_session("Authorization", f"{token_type} {access_token}")
@@ -104,7 +104,7 @@ def bootstrap_login(cfg: Config) -> None:
     try:
         rh_session_reused = try_reuse_robinhood_session(cfg)
     except Exception as e:  # noqa: BLE001 - defense in depth
-        _log(f"Robinhood pickle-reuse threw unexpectedly ({e!s}); ignoring.")
+        _log(f"Robinhood session-reuse threw unexpectedly ({e!s}); ignoring.")
         rh_session_reused = False
     if rh_session_reused:
         _log("Robinhood: reusing persisted session from "
@@ -120,13 +120,13 @@ def bootstrap_login(cfg: Config) -> None:
                 pickle_name=cfg.rh_pickle_name or "",
             )
             _log("Robinhood: logged in with env-supplied credentials; "
-                 "session pickled for next time.")
+                 "session stored for next time.")
         except Exception as e:  # noqa: BLE001
             _log(f"Robinhood env-credential login failed: {e}")
     else:
         _log(
             "Robinhood: no cached session and no env credentials. "
-            "Run `robin-stocks-mcp login` once to seed the pickle, "
+            "Run `robin-stocks-mcp login` once to seed the session file, "
             "or call the `rh_login` MCP tool with username/password/mfa_code."
         )
 
