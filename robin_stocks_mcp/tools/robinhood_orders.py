@@ -762,6 +762,32 @@ async def rh_order_sell_option_limit(
     )
 
 
+@mcp.tool()
+@safe_tool(write=True)
+async def rh_order_sell_option_limit_by_id(
+    positionEffect: str,
+    creditOrDebit: str,
+    price: float,
+    quantity: int,
+    optionID: str,
+    account_number: Optional[str] = None,
+    timeInForce: str = "gtc",
+    jsonify: bool = True,
+) -> Any:
+    """Limit SELL for an option identified by its instrument id (skips id_for_option lookup)."""
+    return await to_thread(
+        rh.order_sell_option_limit_by_id,
+        positionEffect,
+        creditOrDebit,
+        price,
+        quantity,
+        optionID,
+        account_number=account_number,
+        timeInForce=timeInForce,
+        jsonify=jsonify,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Crypto placement
 # ---------------------------------------------------------------------------
