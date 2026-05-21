@@ -8,21 +8,30 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(name='robin_stocks',
       version='3.5.0',
-      description='A Python wrapper around the Robinhood API',
+      description='A Python wrapper around the Robinhood API (with an optional MCP server)',
       long_description=long_description,
       long_description_content_type='text/x-rst',
       url='https://github.com/jmfernandes/robin_stocks',
       author='Josh Fernandes',
       author_email='joshfernandes@mac.com',
-      keywords=['robinhood','robin stocks','finance app','stocks','options','trading','investing'],
+      keywords=['robinhood','robin stocks','finance app','stocks','options','trading','investing','mcp'],
       license='MIT',
-      python_requires='>=3.9',
-      packages=find_packages(),
-      requires=['requests', 'pyotp', 'cryptography'],
+      python_requires='>=3.10',
+      packages=find_packages(include=['robin_stocks', 'robin_stocks.*',
+                                      'robin_stocks_mcp', 'robin_stocks_mcp.*']),
       install_requires=[
           'requests',
           'pyotp',
           'python-dotenv',
-          'cryptography'
+          'cryptography',
       ],
+      extras_require={
+          'mcp': ['mcp[cli]>=1.2.0'],
+          'dev': ['pytest', 'pytest-asyncio', 'pytest-timeout', 'pytest-dotenv'],
+      },
+      entry_points={
+          'console_scripts': [
+              'robin-stocks-mcp=robin_stocks_mcp.server:main',
+          ],
+      },
       zip_safe=False)
