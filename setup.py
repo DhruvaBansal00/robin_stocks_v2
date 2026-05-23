@@ -27,7 +27,7 @@ setup(name='robin_stocks',
       ],
       extras_require={
           'mcp': ['mcp[cli]>=1.2.0'],
-          'dev': ['pytest', 'pytest-asyncio', 'pytest-timeout', 'pytest-dotenv'],
+          'dev': ['pytest', 'pytest-asyncio', 'pytest-timeout', 'pytest-dotenv', 'pytest-cov'],
       },
       entry_points={
           'console_scripts': [

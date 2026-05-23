@@ -11,6 +11,10 @@ uploadnotes.txt
 
 # testing
 tests/app_tests.py
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
 
 # generated app info
 .vscode/
