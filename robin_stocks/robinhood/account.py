@@ -537,8 +537,8 @@ def get_card_transactions(cardType=None, info=None):
 
     """
     payload = None
-    if type:
-        payload = {"type": type}
+    if cardType:
+        payload = {"type": cardType}
 
     url = cardtransactions_url()
     data = request_get(url, "pagination", payload)

@@ -481,3 +481,11 @@ def test_get_next_investment_date_explicit_start_date() -> None:
     url = rg.call_args[0][0]
     assert "frequency=biweekly" in url
     assert "start_date=2026-06-01" in url
+
+
+def test_create_recurring_investment_handles_none_account_profile() -> None:
+    """Regression: when load_account_profile returns None, the auto-detect path must
+    fall through to the graceful error/return-None instead of raising AttributeError."""
+    with patch("robin_stocks.robinhood.recurring_investments.load_account_profile", return_value=None):
+        out = ri.create_recurring_investment("AAPL", 5.0)
+    assert out is None

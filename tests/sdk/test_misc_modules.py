@@ -6,6 +6,7 @@ without error and applies the expected filter mode.
 
 from __future__ import annotations
 
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -313,6 +314,12 @@ def test_create_absolute_csv_defaults_name_from_order_type() -> None:
     out = str(export.create_absolute_csv("/tmp", "", "option"))
     assert "option_orders_" in out
     assert out.endswith(".csv")
+
+
+def test_create_absolute_csv_with_name_respects_dir_path() -> None:
+    """Regression: a provided file_name must land under dir_path, not the CWD."""
+    out = export.create_absolute_csv("/tmp/exports", "orders", "stock")
+    assert out == Path("/tmp/exports").resolve() / "orders.csv"
 
 
 def test_export_completed_stock_orders_writes_csv(tmp_path) -> None:

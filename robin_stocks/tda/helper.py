@@ -34,10 +34,9 @@ def format_inputs(func):
     def format_wrapper(*args, **kwargs):
         bound_args = signature(func).bind(*args, **kwargs)
         bound_args.apply_defaults()
-        target_args = dict(bound_args.arguments)
-        if target_args["jsonify"] is None:
-            kwargs["jsonify"] = get_default_json_flag()
-        return func(*args, **kwargs)
+        if bound_args.arguments.get("jsonify") is None:
+            bound_args.arguments["jsonify"] = get_default_json_flag()
+        return func(*bound_args.args, **bound_args.kwargs)
 
     return format_wrapper
 

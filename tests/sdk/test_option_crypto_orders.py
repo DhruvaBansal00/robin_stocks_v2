@@ -28,7 +28,7 @@ def opt_deps():
         patch("robin_stocks.robinhood.orders.option_instruments_url", return_value="https://api/options/instruments/opt-1/"),
     ]
     entered = [p.__enter__() for p in patches]
-    yield {"request_post": entered[0]}
+    yield {"request_post": entered[0], "load_account_profile": entered[1]}
     for p in patches:
         p.__exit__(None, None, None)
 
@@ -117,6 +117,34 @@ def test_order_option_debit_spread_uses_debit_direction(opt_deps) -> None:
     orders.order_option_debit_spread(1.00, "AAPL", 1, spread)
     payload = opt_deps["request_post"].call_args[0][1]
     assert payload["direction"] == "debit"
+
+
+def test_order_option_credit_spread_does_not_swap_tif_and_account(opt_deps) -> None:
+    """Regression: timeInForce and account_number must not be positionally swapped
+    when forwarding to order_option_spread (whose signature orders account_number first)."""
+    spread = [
+        {
+            "expirationDate": "2026-06-19",
+            "strike": 150,
+            "optionType": "call",
+            "effect": "open",
+            "action": "sell",
+            "ratio_quantity": 1,
+        }
+    ]
+    orders.order_option_credit_spread(1.00, "AAPL", 1, spread, timeInForce="gfd", account_number="ACC-9")
+    payload = opt_deps["request_post"].call_args[0][1]
+    assert payload["time_in_force"] == "gfd"
+    assert opt_deps["load_account_profile"].call_args.kwargs.get("account_number") == "ACC-9"
+
+
+def test_order_sell_option_stop_limit_requires_login(opt_deps) -> None:
+    """Regression: order_sell_option_stop_limit was missing @login_required. With its
+    internals mocked (opt_deps), an undecorated function would complete and return a
+    payload while logged out; the decorator must short-circuit with a "logged in" error."""
+    with patch("robin_stocks.robinhood.helper.LOGGED_IN", False):
+        with pytest.raises(Exception, match="logged in"):
+            orders.order_sell_option_stop_limit("open", "debit", 1.0, 1.1, "AAPL", 1, "2026-06-19", 150, "call")
 
 
 def test_order_option_spread_builds_legs(opt_deps) -> None:
