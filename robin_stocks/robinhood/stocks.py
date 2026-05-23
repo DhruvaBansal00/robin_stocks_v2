@@ -1,8 +1,10 @@
 """Contains information in regards to stocks."""
+
 from functools import lru_cache as cache
 
 from robin_stocks.robinhood.helper import *
 from robin_stocks.robinhood.urls import *
+
 
 def get_quotes(inputSymbols, info=None):
     """Takes any number of stock tickers and returns information pertaining to its price.
@@ -32,10 +34,10 @@ def get_quotes(inputSymbols, info=None):
     """
     symbols = inputs_to_set(inputSymbols)
     url = quotes_url()
-    payload = {'symbols': ','.join(symbols)}
-    data = request_get(url, 'results', payload)
+    payload = {"symbols": ",".join(symbols)}
+    data = request_get(url, "results", payload)
 
-    if (data == None or data == [None]):
+    if data is None or data == [None]:
         return data
 
     for count, item in enumerate(data):
@@ -44,7 +46,7 @@ def get_quotes(inputSymbols, info=None):
 
     data = [item for item in data if item is not None]
 
-    return(filter_data(data, info))
+    return filter_data(data, info)
 
 
 def get_fundamentals(inputSymbols, info=None):
@@ -82,24 +84,24 @@ def get_fundamentals(inputSymbols, info=None):
                       * year_founded
                       * symbol
 
-    """ 
+    """
     symbols = inputs_to_set(inputSymbols)
     url = fundamentals_url()
-    payload = {'symbols': ','.join(symbols)}
-    data = request_get(url, 'results', payload)
+    payload = {"symbols": ",".join(symbols)}
+    data = request_get(url, "results", payload)
 
-    if (data == None or data == [None]):
+    if data is None or data == [None]:
         return data
 
     for count, item in enumerate(data):
         if item is None:
             print(error_ticker_does_not_exist(symbols[count]), file=get_output())
         else:
-            item['symbol'] = symbols[count]
+            item["symbol"] = symbols[count]
 
     data = [item for item in data if item is not None]
 
-    return(filter_data(data, info))
+    return filter_data(data, info)
 
 
 def get_instruments_by_symbols(inputSymbols, info=None):
@@ -137,20 +139,20 @@ def get_instruments_by_symbols(inputSymbols, info=None):
                       * fractional_tradability
                       * default_collar_fraction
 
-    """ 
+    """
     symbols = inputs_to_set(inputSymbols)
     url = instruments_url()
     data = []
     for item in symbols:
-        payload = {'symbol': item}
-        itemData = request_get(url, 'indexzero', payload)
+        payload = {"symbol": item}
+        itemData = request_get(url, "indexzero", payload)
 
         if itemData:
             data.append(itemData)
         else:
             print(error_ticker_does_not_exist(item), file=get_output())
 
-    return(filter_data(data, info))
+    return filter_data(data, info)
 
 
 def get_instrument_by_url(url, info=None):
@@ -190,9 +192,9 @@ def get_instrument_by_url(url, info=None):
                       * default_collar_fraction
 
     """
-    data = request_get(url, 'regular')
+    data = request_get(url, "regular")
 
-    return(filter_data(data, info))
+    return filter_data(data, info)
 
 
 def get_latest_price(inputSymbols, priceType=None, includeExtendedHours=True):
@@ -207,27 +209,31 @@ def get_latest_price(inputSymbols, priceType=None, includeExtendedHours=True):
     :type includeExtendedHours: bool
     :returns: [list] A list of prices as strings.
 
-    """ 
+    """
     symbols = inputs_to_set(inputSymbols)
     quote = get_quotes(symbols)
 
     prices = []
     for item in quote:
         if item:
-            if priceType == 'ask_price':
-                prices.append(item['ask_price'])
-            elif priceType == 'bid_price':
-                prices.append(item['bid_price'])
+            if priceType == "ask_price":
+                prices.append(item["ask_price"])
+            elif priceType == "bid_price":
+                prices.append(item["bid_price"])
             else:
                 if priceType:
-                    print('WARNING: priceType should be "ask_price" or "bid_price". You entered "{0}"'.format(priceType), file=get_output())
-                if item['last_extended_hours_trade_price'] is None or not includeExtendedHours:
-                    prices.append(item['last_trade_price'])
+                    print(
+                        f'WARNING: priceType should be "ask_price" or "bid_price". You entered "{priceType}"',
+                        file=get_output(),
+                    )
+                if item["last_extended_hours_trade_price"] is None or not includeExtendedHours:
+                    prices.append(item["last_trade_price"])
                 else:
-                    prices.append(item['last_extended_hours_trade_price'])
+                    prices.append(item["last_extended_hours_trade_price"])
         else:
             prices.append(None)
-    return(prices)
+    return prices
+
 
 @cache
 @convert_none_to_string
@@ -238,7 +244,7 @@ def get_name_by_symbol(symbol):
     :type symbol: str
     :returns: [str] Returns the simple name of the stock. If the simple name does not exist then returns the full name.
 
-    """ 
+    """
     try:
         symbol = symbol.upper().strip()
     except AttributeError as message:
@@ -246,15 +252,15 @@ def get_name_by_symbol(symbol):
         return None
 
     url = instruments_url()
-    payload = {'symbol': symbol}
-    data = request_get(url, 'indexzero', payload)
+    payload = {"symbol": symbol}
+    data = request_get(url, "indexzero", payload)
     if not data:
-        return(None)
+        return None
     # If stock doesn't have a simple name attribute then get the full name.
-    filter = filter_data(data, info='simple_name')
+    filter = filter_data(data, info="simple_name")
     if not filter or filter == "":
-        filter = filter_data(data, info='name')
-    return(filter)
+        filter = filter_data(data, info="name")
+    return filter
 
 
 @cache
@@ -270,12 +276,12 @@ def get_name_by_url(url):
     """
     data = request_get(url)
     if not data:
-        return(None)
+        return None
     # If stock doesn't have a simple name attribute then get the full name.
-    filter = filter_data(data, info='simple_name')
+    filter = filter_data(data, info="simple_name")
     if not filter or filter == "":
-        filter = filter_data(data, info='name')
-    return(filter)
+        filter = filter_data(data, info="name")
+    return filter
 
 
 @cache
@@ -290,7 +296,8 @@ def get_symbol_by_url(url):
 
     """
     data = request_get(url)
-    return filter_data(data, info='symbol')
+    return filter_data(data, info="symbol")
+
 
 @convert_none_to_string
 def get_ratings(symbol, info=None):
@@ -308,7 +315,7 @@ def get_ratings(symbol, info=None):
                       * instrument_id - value is a string
                       * ratings_published_at - value is a string
 
-    """ 
+    """
     try:
         symbol = symbol.upper().strip()
     except AttributeError as message:
@@ -318,17 +325,17 @@ def get_ratings(symbol, info=None):
     url = ratings_url(symbol)
     data = request_get(url)
     if not data:
-        return(data)
+        return data
 
-    if (len(data['ratings']) == 0):
-        return(data)
+    if len(data["ratings"]) == 0:
+        return data
     else:
-        for item in data['ratings']:
-            oldText = item['text']
-            item['text'] = oldText.encode('UTF-8')
+        for item in data["ratings"]:
+            oldText = item["text"]
+            item["text"] = oldText.encode("UTF-8")
 
-    return(filter_data(data, info))
-    
+    return filter_data(data, info)
+
 
 def get_events(symbol, info=None):
     """Returns the events related to a stock that the user owns. For example, if you owned options for USO and that stock \
@@ -358,18 +365,18 @@ def get_events(symbol, info=None):
                       * underlying_price
                       * updated_at
 
-    """ 
+    """
     try:
         symbol = symbol.upper().strip()
     except AttributeError as message:
         print(message, file=get_output())
         return None
 
-    payload = {'equity_instrument_id': id_for_stock(symbol)}
+    payload = {"equity_instrument_id": id_for_stock(symbol)}
     url = events_url()
-    data = request_get(url, 'results', payload)
+    data = request_get(url, "results", payload)
 
-    return(filter_data(data, info))
+    return filter_data(data, info)
 
 
 def get_earnings(symbol, info=None):
@@ -390,7 +397,7 @@ def get_earnings(symbol, info=None):
                       * report
                       * call
 
-    """ 
+    """
     try:
         symbol = symbol.upper().strip()
     except AttributeError as message:
@@ -398,10 +405,10 @@ def get_earnings(symbol, info=None):
         return None
 
     url = earnings_url()
-    payload = {'symbol': symbol}
-    data = request_get(url, 'results', payload)
+    payload = {"symbol": symbol}
+    data = request_get(url, "results", payload)
 
-    return(filter_data(data, info))
+    return filter_data(data, info)
 
 
 def get_news(symbol, info=None):
@@ -430,7 +437,7 @@ def get_news(symbol, info=None):
                       * preview_text
                       * currency_id
 
-    """ 
+    """
     try:
         symbol = symbol.upper().strip()
     except AttributeError as message:
@@ -438,9 +445,9 @@ def get_news(symbol, info=None):
         return None
 
     url = news_url(symbol)
-    data = request_get(url, 'results')
+    data = request_get(url, "results")
 
-    return(filter_data(data, info))
+    return filter_data(data, info)
 
 
 def get_splits(symbol, info=None):
@@ -468,8 +475,8 @@ def get_splits(symbol, info=None):
         return None
 
     url = splits_url(symbol)
-    data = request_get(url, 'results')
-    return(filter_data(data, info))
+    data = request_get(url, "results")
+    return filter_data(data, info)
 
 
 def find_instrument_data(query):
@@ -503,21 +510,21 @@ def find_instrument_data(query):
                       * fractional_tradability
                       * default_collar_fraction
 
-    """ 
+    """
     url = instruments_url()
-    payload = {'query': query}
+    payload = {"query": query}
 
-    data = request_get(url, 'pagination', payload)
+    data = request_get(url, "pagination", payload)
 
     if len(data) == 0:
-        print('No results found for that keyword', file=get_output())
-        return([None])
+        print("No results found for that keyword", file=get_output())
+        return [None]
     else:
-        print('Found ' + str(len(data)) + ' results', file=get_output())
-        return(data)
+        print("Found " + str(len(data)) + " results", file=get_output())
+        return data
 
 
-def get_stock_historicals(inputSymbols, interval='hour', span='week', bounds='regular', info=None):
+def get_stock_historicals(inputSymbols, interval="hour", span="week", bounds="regular", info=None):
     """Represents the historicl data for a stock.
 
     :param inputSymbols: May be a single stock ticker or a list of stock tickers.
@@ -542,47 +549,43 @@ def get_stock_historicals(inputSymbols, interval='hour', span='week', bounds='re
                       * interpolated
                       * symbol
 
-    """    
-    interval_check = ['5minute', '10minute', 'hour', 'day', 'week']
-    span_check = ['day', 'week', 'month', '3month', 'year', '5year']
-    bounds_check = ['extended', 'regular', 'trading']
+    """
+    interval_check = ["5minute", "10minute", "hour", "day", "week"]
+    span_check = ["day", "week", "month", "3month", "year", "5year"]
+    bounds_check = ["extended", "regular", "trading"]
 
     if interval not in interval_check:
-        print(
-            'ERROR: Interval must be "5minute","10minute","hour","day",or "week"', file=get_output())
-        return([None])
+        print('ERROR: Interval must be "5minute","10minute","hour","day",or "week"', file=get_output())
+        return [None]
     if span not in span_check:
         print('ERROR: Span must be "day","week","month","3month","year",or "5year"', file=get_output())
-        return([None])
+        return [None]
     if bounds not in bounds_check:
         print('ERROR: Bounds must be "extended","regular",or "trading"', file=get_output())
-        return([None])
-    if (bounds == 'extended' or bounds == 'trading') and span != 'day':
+        return [None]
+    if (bounds == "extended" or bounds == "trading") and span != "day":
         print('ERROR: extended and trading bounds can only be used with a span of "day"', file=get_output())
-        return([None])
+        return [None]
 
     symbols = inputs_to_set(inputSymbols)
     url = historicals_url()
-    payload = {'symbols': ','.join(symbols),
-               'interval': interval,
-               'span': span,
-               'bounds': bounds}
+    payload = {"symbols": ",".join(symbols), "interval": interval, "span": span, "bounds": bounds}
 
-    data = request_get(url, 'results', payload)
-    if (data == None or data == [None]):
+    data = request_get(url, "results", payload)
+    if data is None or data == [None]:
         return data
 
     histData = []
     for count, item in enumerate(data):
-        if (len(item['historicals']) == 0):
+        if len(item["historicals"]) == 0:
             print(error_ticker_does_not_exist(symbols[count]), file=get_output())
             continue
-        stockSymbol = item['symbol']
-        for subitem in item['historicals']:
-            subitem['symbol'] = stockSymbol
+        stockSymbol = item["symbol"]
+        for subitem in item["historicals"]:
+            subitem["symbol"] = stockSymbol
             histData.append(subitem)
 
-    return(filter_data(histData, info))
+    return filter_data(histData, info)
 
 
 def get_index_quote_by_id(stock_id, info=None):
@@ -597,7 +600,7 @@ def get_index_quote_by_id(stock_id, info=None):
     """
     url = marketdata_index_quotes_url(stock_id)
     data = request_get(url)
-    return (filter_data(data, info))
+    return filter_data(data, info)
 
 
 def get_stock_quote_by_id(stock_id, info=None):
@@ -630,7 +633,7 @@ def get_stock_quote_by_id(stock_id, info=None):
     url = marketdata_quotes_url(stock_id)
     data = request_get(url)
 
-    return (filter_data(data, info))
+    return filter_data(data, info)
 
 
 def get_stock_quote_by_symbol(symbol, info=None):
@@ -680,7 +683,7 @@ def get_pricebook_by_id(stock_id, info=None):
     url = marketdata_pricebook_url(stock_id)
     data = request_get(url)
 
-    return (filter_data(data, info))
+    return filter_data(data, info)
 
 
 def get_pricebook_by_symbol(symbol, info=None):

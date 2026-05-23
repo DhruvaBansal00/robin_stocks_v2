@@ -21,7 +21,6 @@ from __future__ import annotations
 import json
 import os
 import sys
-from typing import Optional
 
 import robin_stocks.gemini as gem
 import robin_stocks.robinhood as rh
@@ -40,7 +39,7 @@ def _log(msg: str) -> None:
     print(f"[robin_stocks_mcp] {msg}", file=sys.stderr)
 
 
-def _resolve_mfa(value: Optional[str]) -> Optional[str]:
+def _resolve_mfa(value: str | None) -> str | None:
     """Treat the env value as either a literal MFA code or a TOTP secret."""
     if not value:
         return None
@@ -69,15 +68,13 @@ def try_reuse_robinhood_session(cfg: Config) -> bool:
     if not os.path.isfile(pickle_path):
         return False
     try:
-        with open(pickle_path, "r") as f:
+        with open(pickle_path) as f:
             data = json.load(f)
         token_type = data["token_type"]
         access_token = data["access_token"]
         update_session("Authorization", f"{token_type} {access_token}")
         # Probe the API — a 200 here means the cached token still works.
-        res = request_get(
-            positions_url(), "pagination", {"nonzero": "true"}, jsonify_data=False
-        )
+        res = request_get(positions_url(), "pagination", {"nonzero": "true"}, jsonify_data=False)
         res.raise_for_status()
         set_login_state(True)
         return True
@@ -107,8 +104,7 @@ def bootstrap_login(cfg: Config) -> None:
         _log(f"Robinhood session-reuse threw unexpectedly ({e!s}); ignoring.")
         rh_session_reused = False
     if rh_session_reused:
-        _log("Robinhood: reusing persisted session from "
-             f"{_robinhood_pickle_path(cfg)}.")
+        _log(f"Robinhood: reusing persisted session from {_robinhood_pickle_path(cfg)}.")
     elif cfg.rh_username and cfg.rh_password:
         try:
             rh.login(
@@ -119,8 +115,7 @@ def bootstrap_login(cfg: Config) -> None:
                 pickle_path=cfg.rh_pickle_path or "",
                 pickle_name=cfg.rh_pickle_name or "",
             )
-            _log("Robinhood: logged in with env-supplied credentials; "
-                 "session stored for next time.")
+            _log("Robinhood: logged in with env-supplied credentials; session stored for next time.")
         except Exception as e:  # noqa: BLE001
             _log(f"Robinhood env-credential login failed: {e}")
     else:
@@ -156,7 +151,4 @@ def bootstrap_login(cfg: Config) -> None:
         except Exception as e:  # noqa: BLE001
             _log(f"Gemini login failed: {e}")
     else:
-        _log(
-            "Gemini: no API keys set. Either set GEMINI_API_KEY/GEMINI_SECRET_KEY "
-            "or call the `gem_login` MCP tool."
-        )
+        _log("Gemini: no API keys set. Either set GEMINI_API_KEY/GEMINI_SECRET_KEY or call the `gem_login` MCP tool.")

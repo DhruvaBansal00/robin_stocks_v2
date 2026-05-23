@@ -88,14 +88,32 @@ def test_order_buy_option_limit_invalid_symbol_returns_none(opt_deps) -> None:
 
 
 def test_order_option_credit_spread_uses_credit_direction(opt_deps) -> None:
-    spread = [{"expirationDate": "2026-06-19", "strike": 150, "optionType": "call", "effect": "open", "action": "sell", "ratio_quantity": 1}]
+    spread = [
+        {
+            "expirationDate": "2026-06-19",
+            "strike": 150,
+            "optionType": "call",
+            "effect": "open",
+            "action": "sell",
+            "ratio_quantity": 1,
+        }
+    ]
     orders.order_option_credit_spread(1.00, "AAPL", 1, spread)
     payload = opt_deps["request_post"].call_args[0][1]
     assert payload["direction"] == "credit"
 
 
 def test_order_option_debit_spread_uses_debit_direction(opt_deps) -> None:
-    spread = [{"expirationDate": "2026-06-19", "strike": 150, "optionType": "call", "effect": "open", "action": "buy", "ratio_quantity": 1}]
+    spread = [
+        {
+            "expirationDate": "2026-06-19",
+            "strike": 150,
+            "optionType": "call",
+            "effect": "open",
+            "action": "buy",
+            "ratio_quantity": 1,
+        }
+    ]
     orders.order_option_debit_spread(1.00, "AAPL", 1, spread)
     payload = opt_deps["request_post"].call_args[0][1]
     assert payload["direction"] == "debit"
@@ -103,8 +121,22 @@ def test_order_option_debit_spread_uses_debit_direction(opt_deps) -> None:
 
 def test_order_option_spread_builds_legs(opt_deps) -> None:
     spread = [
-        {"expirationDate": "2026-06-19", "strike": 150, "optionType": "call", "effect": "open", "action": "buy", "ratio_quantity": 1},
-        {"expirationDate": "2026-06-19", "strike": 160, "optionType": "call", "effect": "open", "action": "sell", "ratio_quantity": 1},
+        {
+            "expirationDate": "2026-06-19",
+            "strike": 150,
+            "optionType": "call",
+            "effect": "open",
+            "action": "buy",
+            "ratio_quantity": 1,
+        },
+        {
+            "expirationDate": "2026-06-19",
+            "strike": 160,
+            "optionType": "call",
+            "effect": "open",
+            "action": "sell",
+            "ratio_quantity": 1,
+        },
     ]
     orders.order_option_spread("debit", 1.00, "AAPL", 1, spread)
     payload = opt_deps["request_post"].call_args[0][1]
@@ -171,11 +203,19 @@ def test_order_sell_crypto_limit_by_price_delegates(crypto_order_mock) -> None:
 
 
 def test_order_crypto_builds_market_payload() -> None:
-    with patch("robin_stocks.robinhood.orders.request_post", return_value={"id": "c"}) as rp, \
-         patch("robin_stocks.robinhood.orders.load_crypto_profile", return_value={"id": "crypto-acct"}), \
-         patch("robin_stocks.robinhood.orders.get_crypto_info", return_value={"id": "btc-id", "min_order_quantity_increment": "0.0001"}), \
-         patch("robin_stocks.robinhood.orders.get_crypto_quote", return_value={"mark_price": "50000", "ask_price": "50001", "bid_price": "49999"}), \
-         patch("robin_stocks.robinhood.orders.round_price", side_effect=lambda x: x):
+    with (
+        patch("robin_stocks.robinhood.orders.request_post", return_value={"id": "c"}) as rp,
+        patch("robin_stocks.robinhood.orders.load_crypto_profile", return_value={"id": "crypto-acct"}),
+        patch(
+            "robin_stocks.robinhood.orders.get_crypto_info",
+            return_value={"id": "btc-id", "min_order_quantity_increment": "0.0001"},
+        ),
+        patch(
+            "robin_stocks.robinhood.orders.get_crypto_quote",
+            return_value={"mark_price": "50000", "ask_price": "50001", "bid_price": "49999"},
+        ),
+        patch("robin_stocks.robinhood.orders.round_price", side_effect=lambda x: x),
+    ):
         orders.order_crypto("BTC", "buy", 0.01, amountIn="quantity")
     rp.assert_called_once()
     payload = rp.call_args[0][1]

@@ -22,10 +22,7 @@ def get_hours_for_markets(markets, date, jsonify=None):
 
     """
     url = URLS.markets()
-    payload = {
-        "markets": markets,
-        "date": date
-    }
+    payload = {"markets": markets, "date": date}
     data, error = request_get(url, payload, jsonify)
     return data, error
 
@@ -50,9 +47,7 @@ def get_hours_for_market(market, date, jsonify=None):
 
     """
     url = URLS.market(market)
-    payload = {
-        "date": date
-    }
+    payload = {"date": date}
     data, error = request_get(url, payload, jsonify)
     return data, error
 
@@ -78,9 +73,6 @@ def get_movers(market, direction, change, jsonify=None):
 
     """
     url = URLS.movers(market)
-    payload = {
-        "direction": direction,
-        "change": change
-    }
+    payload = {"direction": direction, "change": change}
     data, error = request_get(url, payload, jsonify)
     return data, error

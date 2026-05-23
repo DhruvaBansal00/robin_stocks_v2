@@ -1,6 +1,5 @@
 from robin_stocks.gemini.authentication import generate_signature
-from robin_stocks.gemini.helper import (format_inputs, login_required,
-                                        request_get, request_post)
+from robin_stocks.gemini.helper import format_inputs, login_required, request_get, request_post
 from robin_stocks.gemini.urls import URLS
 
 
@@ -113,7 +112,7 @@ def get_notional_volume(jsonify=None):
     :returns: Returns a tuple where the first entry in the tuple is a requests reponse object  \
         or a dictionary parsed using the JSON format and the second entry is an error string or \
         None if there was not an error. \
-        The keys for the dictionary are listed below.               
+        The keys for the dictionary are listed below.
     :Dictionary Keys: * date - UTC date in yyyy-MM-dd format
                       * last_updated_ms - Unix timestamp in millisecond of the last update
                       * web_maker_fee_bps - Integer value representing the maker fee for all symbols in basis point for web orders
@@ -131,9 +130,7 @@ def get_notional_volume(jsonify=None):
                       * notional_1d_volume - A list of 1 day notional volume for the past 30 days
     """
     url = URLS.notional_volume()
-    payload = {
-        "request": URLS.get_endpoint(url)
-    }
+    payload = {"request": URLS.get_endpoint(url)}
     generate_signature(payload)
     data, err = request_post(url, payload, jsonify)
     return data, err
@@ -150,7 +147,7 @@ def get_trade_volume(jsonify=None):
     :returns: Returns a tuple where the first entry in the tuple is a requests reponse object  \
         or a dictionary parsed using the JSON format and the second entry is an error string or \
         None if there was not an error. \
-        The keys for the dictionary are listed below.               
+        The keys for the dictionary are listed below.
     :Dictionary Keys: * symbol - The symbol.
                       * base_currency - quantity is denominated in this currency.
                       * notional_currency - price is denominated as the amount of notional currency per one unit of base currency. Notional values are denominated in this currency.
@@ -169,19 +166,17 @@ def get_trade_volume(jsonify=None):
                       * sell_taker_base - Quantity for this day where the account was a taker on the sell side of the trade.
                       * sell_taker_notional - Notional value for this day where the account was a taker on the sell side of the trade.
                       * sell_taker_count - Number of trades for this day where the account was a taker on the sell side of the trade.
-                      
+
     """
     url = URLS.trade_volume()
-    payload = {
-        "request": URLS.get_endpoint(url)
-    }
+    payload = {"request": URLS.get_endpoint(url)}
     generate_signature(payload)
     data, err = request_post(url, payload, jsonify)
     return data, err
 
 
 def get_price(ticker, side):
-    """ Returns either the bid or the ask price as a string.
+    """Returns either the bid or the ask price as a string.
 
     :param ticker: The ticker of the crypto.
     :type ticker: str

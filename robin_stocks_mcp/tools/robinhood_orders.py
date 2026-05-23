@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 import robin_stocks.robinhood as rh
 
@@ -17,41 +17,35 @@ from ..runtime import safe_tool, to_thread
 @mcp.tool()
 @safe_tool()
 async def rh_get_all_stock_orders(
-    info: Optional[str] = None,
-    account_number: Optional[str] = None,
-    start_date: Optional[str] = None,
+    info: str | None = None,
+    account_number: str | None = None,
+    start_date: str | None = None,
 ) -> Any:
     """All stock orders ever processed for the account."""
-    return await to_thread(
-        rh.get_all_stock_orders, info=info, account_number=account_number, start_date=start_date
-    )
+    return await to_thread(rh.get_all_stock_orders, info=info, account_number=account_number, start_date=start_date)
 
 
 @mcp.tool()
 @safe_tool()
 async def rh_get_all_option_orders(
-    info: Optional[str] = None,
-    account_number: Optional[str] = None,
-    start_date: Optional[str] = None,
+    info: str | None = None,
+    account_number: str | None = None,
+    start_date: str | None = None,
 ) -> Any:
     """All option orders ever processed for the account."""
-    return await to_thread(
-        rh.get_all_option_orders, info=info, account_number=account_number, start_date=start_date
-    )
+    return await to_thread(rh.get_all_option_orders, info=info, account_number=account_number, start_date=start_date)
 
 
 @mcp.tool()
 @safe_tool()
-async def rh_get_all_crypto_orders(info: Optional[str] = None) -> Any:
+async def rh_get_all_crypto_orders(info: str | None = None) -> Any:
     """All crypto orders ever processed for the account."""
     return await to_thread(rh.get_all_crypto_orders, info=info)
 
 
 @mcp.tool()
 @safe_tool()
-async def rh_get_all_open_stock_orders(
-    info: Optional[str] = None, account_number: Optional[str] = None
-) -> Any:
+async def rh_get_all_open_stock_orders(info: str | None = None, account_number: str | None = None) -> Any:
     """All currently-open stock orders."""
     return await to_thread(rh.get_all_open_stock_orders, info=info, account_number=account_number)
 
@@ -59,9 +53,9 @@ async def rh_get_all_open_stock_orders(
 @mcp.tool()
 @safe_tool()
 async def rh_get_all_open_option_orders(
-    info: Optional[str] = None,
-    account_number: Optional[str] = None,
-    start_date: Optional[str] = None,
+    info: str | None = None,
+    account_number: str | None = None,
+    start_date: str | None = None,
 ) -> Any:
     """All currently-open option orders. `start_date` filters to orders at/after YYYY-MM-DD."""
     return await to_thread(
@@ -74,7 +68,7 @@ async def rh_get_all_open_option_orders(
 
 @mcp.tool()
 @safe_tool()
-async def rh_get_all_open_crypto_orders(info: Optional[str] = None) -> Any:
+async def rh_get_all_open_crypto_orders(info: str | None = None) -> Any:
     """All currently-open crypto orders."""
     return await to_thread(rh.get_all_open_crypto_orders, info=info)
 
@@ -135,14 +129,14 @@ async def rh_cancel_crypto_order(orderID: str) -> Any:
 
 @mcp.tool()
 @safe_tool(write=True)
-async def rh_cancel_all_stock_orders(account_number: Optional[str] = None) -> Any:
+async def rh_cancel_all_stock_orders(account_number: str | None = None) -> Any:
     """Cancel ALL open stock orders."""
     return await to_thread(rh.cancel_all_stock_orders, account_number=account_number)
 
 
 @mcp.tool()
 @safe_tool(write=True)
-async def rh_cancel_all_option_orders(account_number: Optional[str] = None) -> Any:
+async def rh_cancel_all_option_orders(account_number: str | None = None) -> Any:
     """Cancel ALL open option orders."""
     return await to_thread(rh.cancel_all_option_orders, account_number=account_number)
 
@@ -164,7 +158,7 @@ async def rh_cancel_all_crypto_orders() -> Any:
 async def rh_order_buy_market(
     symbol: str,
     quantity: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -186,7 +180,7 @@ async def rh_order_buy_market(
 async def rh_order_buy_fractional_by_quantity(
     symbol: str,
     quantity: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gfd",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -208,7 +202,7 @@ async def rh_order_buy_fractional_by_quantity(
 async def rh_order_buy_fractional_by_price(
     symbol: str,
     amountInDollars: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gfd",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -233,7 +227,7 @@ async def rh_order_buy_limit(
     symbol: str,
     quantity: float,
     limitPrice: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -257,7 +251,7 @@ async def rh_order_buy_stop_loss(
     symbol: str,
     quantity: float,
     stopPrice: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -282,7 +276,7 @@ async def rh_order_buy_stop_limit(
     quantity: float,
     limitPrice: float,
     stopPrice: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -330,7 +324,7 @@ async def rh_order_buy_trailing_stop(
 async def rh_order_sell_market(
     symbol: str,
     quantity: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -352,7 +346,7 @@ async def rh_order_sell_market(
 async def rh_order_sell_tax_lot(
     symbol: str,
     lots: list[dict],
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gfd",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -380,7 +374,7 @@ async def rh_order_sell_tax_lot(
 async def rh_order_sell_fractional_by_quantity(
     symbol: str,
     quantity: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gfd",
     priceType: str = "bid_price",
     extendedHours: bool = False,
@@ -406,7 +400,7 @@ async def rh_order_sell_fractional_by_quantity(
 async def rh_order_sell_fractional_by_price(
     symbol: str,
     amountInDollars: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gfd",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -429,7 +423,7 @@ async def rh_order_sell_limit(
     symbol: str,
     quantity: float,
     limitPrice: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -453,7 +447,7 @@ async def rh_order_sell_stop_loss(
     symbol: str,
     quantity: float,
     stopPrice: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -478,7 +472,7 @@ async def rh_order_sell_stop_limit(
     quantity: float,
     limitPrice: float,
     stopPrice: float,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -527,9 +521,9 @@ async def rh_order(
     symbol: str,
     quantity: float,
     side: str,
-    limitPrice: Optional[float] = None,
-    stopPrice: Optional[float] = None,
-    account_number: Optional[str] = None,
+    limitPrice: float | None = None,
+    stopPrice: float | None = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     extendedHours: bool = False,
     jsonify: bool = True,
@@ -564,7 +558,7 @@ async def rh_order_option_credit_spread(
     quantity: int,
     spread: list,
     timeInForce: str = "gtc",
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     jsonify: bool = True,
 ) -> Any:
     """Place an option credit spread order. `spread` is a list of leg dicts."""
@@ -588,7 +582,7 @@ async def rh_order_option_debit_spread(
     quantity: int,
     spread: list,
     timeInForce: str = "gtc",
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     jsonify: bool = True,
 ) -> Any:
     """Place an option debit spread order."""
@@ -612,7 +606,7 @@ async def rh_order_option_spread(
     symbol: str,
     quantity: int,
     spread: list,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     jsonify: bool = True,
 ) -> Any:
@@ -641,7 +635,7 @@ async def rh_order_buy_option_limit(
     expirationDate: str,
     strike: float,
     optionType: str = "both",
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     jsonify: bool = True,
 ) -> Any:
@@ -674,7 +668,7 @@ async def rh_order_buy_option_stop_limit(
     expirationDate: str,
     strike: float,
     optionType: str = "both",
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     jsonify: bool = True,
 ) -> Any:
@@ -708,7 +702,7 @@ async def rh_order_sell_option_stop_limit(
     expirationDate: str,
     strike: float,
     optionType: str = "both",
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     jsonify: bool = True,
 ) -> Any:
@@ -741,7 +735,7 @@ async def rh_order_sell_option_limit(
     expirationDate: str,
     strike: float,
     optionType: str = "both",
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     jsonify: bool = True,
 ) -> Any:
@@ -770,7 +764,7 @@ async def rh_order_sell_option_limit_by_id(
     price: float,
     quantity: int,
     optionID: str,
-    account_number: Optional[str] = None,
+    account_number: str | None = None,
     timeInForce: str = "gtc",
     jsonify: bool = True,
 ) -> Any:
@@ -799,20 +793,14 @@ async def rh_order_buy_crypto_by_price(
     symbol: str, amountInDollars: float, timeInForce: str = "gtc", jsonify: bool = True
 ) -> Any:
     """Market BUY crypto by dollar amount."""
-    return await to_thread(
-        rh.order_buy_crypto_by_price, symbol, amountInDollars, timeInForce=timeInForce, jsonify=jsonify
-    )
+    return await to_thread(rh.order_buy_crypto_by_price, symbol, amountInDollars, timeInForce=timeInForce, jsonify=jsonify)
 
 
 @mcp.tool()
 @safe_tool(write=True)
-async def rh_order_buy_crypto_by_quantity(
-    symbol: str, quantity: float, timeInForce: str = "gtc", jsonify: bool = True
-) -> Any:
+async def rh_order_buy_crypto_by_quantity(symbol: str, quantity: float, timeInForce: str = "gtc", jsonify: bool = True) -> Any:
     """Market BUY crypto by quantity."""
-    return await to_thread(
-        rh.order_buy_crypto_by_quantity, symbol, quantity, timeInForce=timeInForce, jsonify=jsonify
-    )
+    return await to_thread(rh.order_buy_crypto_by_quantity, symbol, quantity, timeInForce=timeInForce, jsonify=jsonify)
 
 
 @mcp.tool()
@@ -821,9 +809,7 @@ async def rh_order_buy_crypto_limit(
     symbol: str, quantity: float, limitPrice: float, timeInForce: str = "gtc", jsonify: bool = True
 ) -> Any:
     """Limit BUY crypto by quantity."""
-    return await to_thread(
-        rh.order_buy_crypto_limit, symbol, quantity, limitPrice, timeInForce=timeInForce, jsonify=jsonify
-    )
+    return await to_thread(rh.order_buy_crypto_limit, symbol, quantity, limitPrice, timeInForce=timeInForce, jsonify=jsonify)
 
 
 @mcp.tool()
@@ -852,9 +838,7 @@ async def rh_order_sell_crypto_by_price(
     symbol: str, amountInDollars: float, timeInForce: str = "gtc", jsonify: bool = True
 ) -> Any:
     """Market SELL crypto by dollar amount."""
-    return await to_thread(
-        rh.order_sell_crypto_by_price, symbol, amountInDollars, timeInForce=timeInForce, jsonify=jsonify
-    )
+    return await to_thread(rh.order_sell_crypto_by_price, symbol, amountInDollars, timeInForce=timeInForce, jsonify=jsonify)
 
 
 @mcp.tool()
@@ -863,9 +847,7 @@ async def rh_order_sell_crypto_by_quantity(
     symbol: str, quantity: float, timeInForce: str = "gtc", jsonify: bool = True
 ) -> Any:
     """Market SELL crypto by quantity."""
-    return await to_thread(
-        rh.order_sell_crypto_by_quantity, symbol, quantity, timeInForce=timeInForce, jsonify=jsonify
-    )
+    return await to_thread(rh.order_sell_crypto_by_quantity, symbol, quantity, timeInForce=timeInForce, jsonify=jsonify)
 
 
 @mcp.tool()
@@ -874,9 +856,7 @@ async def rh_order_sell_crypto_limit(
     symbol: str, quantity: float, limitPrice: float, timeInForce: str = "gtc", jsonify: bool = True
 ) -> Any:
     """Limit SELL crypto by quantity."""
-    return await to_thread(
-        rh.order_sell_crypto_limit, symbol, quantity, limitPrice, timeInForce=timeInForce, jsonify=jsonify
-    )
+    return await to_thread(rh.order_sell_crypto_limit, symbol, quantity, limitPrice, timeInForce=timeInForce, jsonify=jsonify)
 
 
 @mcp.tool()
@@ -906,7 +886,7 @@ async def rh_order_crypto(
     side: str,
     quantityOrPrice: float,
     amountIn: str = "quantity",
-    limitPrice: Optional[float] = None,
+    limitPrice: float | None = None,
     timeInForce: str = "gtc",
     jsonify: bool = True,
 ) -> Any:

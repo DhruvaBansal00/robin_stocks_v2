@@ -61,16 +61,19 @@ def test_server_subprocess_lists_tools() -> None:
     )
     try:
         # MCP handshake
-        _send(proc, {
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": "initialize",
-            "params": {
-                "protocolVersion": "2025-06-18",
-                "capabilities": {},
-                "clientInfo": {"name": "test", "version": "0"},
+        _send(
+            proc,
+            {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "initialize",
+                "params": {
+                    "protocolVersion": "2025-06-18",
+                    "capabilities": {},
+                    "clientInfo": {"name": "test", "version": "0"},
+                },
             },
-        })
+        )
         init_resp = _recv(proc)
         assert init_resp.get("id") == 1
         assert "result" in init_resp, init_resp
@@ -118,28 +121,34 @@ def test_server_subprocess_blocks_write_in_read_only() -> None:
         cwd=str(REPO_ROOT),
     )
     try:
-        _send(proc, {
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": "initialize",
-            "params": {
-                "protocolVersion": "2025-06-18",
-                "capabilities": {},
-                "clientInfo": {"name": "test", "version": "0"},
+        _send(
+            proc,
+            {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "initialize",
+                "params": {
+                    "protocolVersion": "2025-06-18",
+                    "capabilities": {},
+                    "clientInfo": {"name": "test", "version": "0"},
+                },
             },
-        })
+        )
         _recv(proc)
         _send(proc, {"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}})
 
-        _send(proc, {
-            "jsonrpc": "2.0",
-            "id": 2,
-            "method": "tools/call",
-            "params": {
-                "name": "rh_order_buy_market",
-                "arguments": {"symbol": "AAPL", "quantity": 1},
+        _send(
+            proc,
+            {
+                "jsonrpc": "2.0",
+                "id": 2,
+                "method": "tools/call",
+                "params": {
+                    "name": "rh_order_buy_market",
+                    "arguments": {"symbol": "AAPL", "quantity": 1},
+                },
             },
-        })
+        )
         resp = _recv(proc, timeout_s=15.0)
         # FastMCP returns either an isError result or an error payload; either way the
         # server must surface ReadOnlyError without crashing.

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Optional
 
 try:
     from dotenv import load_dotenv
@@ -28,18 +27,18 @@ class Config:
     auto_login: bool = True
 
     # Robinhood
-    rh_username: Optional[str] = None
-    rh_password: Optional[str] = None
-    rh_mfa_code: Optional[str] = None  # TOTP secret OR static code
-    rh_pickle_path: Optional[str] = None
-    rh_pickle_name: Optional[str] = None
+    rh_username: str | None = None
+    rh_password: str | None = None
+    rh_mfa_code: str | None = None  # TOTP secret OR static code
+    rh_pickle_path: str | None = None
+    rh_pickle_name: str | None = None
 
     # TD Ameritrade
-    tda_encryption_passcode: Optional[str] = None
+    tda_encryption_passcode: str | None = None
 
     # Gemini
-    gemini_api_key: Optional[str] = None
-    gemini_secret_key: Optional[str] = None
+    gemini_api_key: str | None = None
+    gemini_secret_key: str | None = None
     gemini_sandbox: bool = False
 
 

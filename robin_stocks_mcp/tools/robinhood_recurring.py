@@ -8,13 +8,12 @@ are also exposed here.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 import robin_stocks.robinhood as rh
 
 from ..app import mcp
 from ..runtime import safe_tool, to_thread
-
 
 # ---------------------------------------------------------------------------
 # Rate-limiter toggles (local SDK state, not server-side writes)
@@ -43,9 +42,9 @@ async def rh_disable_rate_limiting() -> str:
 @mcp.tool()
 @safe_tool()
 async def rh_get_recurring_investments(
-    info: Optional[str] = None,
-    account_number: Optional[str] = None,
-    asset_types: Optional[list[str]] = None,
+    info: str | None = None,
+    account_number: str | None = None,
+    asset_types: list[str] | None = None,
     jsonify: bool = True,
 ) -> Any:
     """List all recurring-investment schedules for the account."""
@@ -62,7 +61,7 @@ async def rh_get_recurring_investments(
 @safe_tool()
 async def rh_get_next_investment_date(
     frequency: str = "weekly",
-    start_date: Optional[str] = None,
+    start_date: str | None = None,
     jsonify: bool = True,
 ) -> Any:
     """Compute when the next investment for a given frequency/start would run."""
@@ -80,8 +79,8 @@ async def rh_create_recurring_investment(
     symbol: str,
     amount: float,
     frequency: str = "weekly",
-    start_date: Optional[str] = None,
-    account_number: Optional[str] = None,
+    start_date: str | None = None,
+    account_number: str | None = None,
     source_of_funds: str = "buying_power",
     jsonify: bool = True,
 ) -> Any:
@@ -105,11 +104,11 @@ async def rh_create_recurring_investment(
 @safe_tool(write=True)
 async def rh_update_recurring_investment(
     schedule_id: str,
-    account_number: Optional[str] = None,
-    amount: Optional[float] = None,
-    frequency: Optional[str] = None,
-    state: Optional[str] = None,
-    start_date: Optional[str] = None,
+    account_number: str | None = None,
+    amount: float | None = None,
+    frequency: str | None = None,
+    state: str | None = None,
+    start_date: str | None = None,
     jsonify: bool = True,
 ) -> Any:
     """Modify an existing recurring-investment schedule (any subset of fields)."""
@@ -127,8 +126,6 @@ async def rh_update_recurring_investment(
 
 @mcp.tool()
 @safe_tool(write=True)
-async def rh_cancel_recurring_investment(
-    schedule_id: str, jsonify: bool = True
-) -> Any:
+async def rh_cancel_recurring_investment(schedule_id: str, jsonify: bool = True) -> Any:
     """Cancel (state='deleted') a recurring-investment schedule by id."""
     return await to_thread(rh.cancel_recurring_investment, schedule_id, jsonify=jsonify)

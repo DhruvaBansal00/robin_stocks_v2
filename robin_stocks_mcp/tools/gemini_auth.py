@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 import robin_stocks.gemini as gem
 
@@ -28,7 +28,7 @@ async def gem_logout() -> str:
 
 @mcp.tool()
 @safe_tool()
-async def gem_heartbeat(jsonify: Optional[bool] = None) -> Any:
+async def gem_heartbeat(jsonify: bool | None = None) -> Any:
     """Send a heartbeat to keep the Gemini session alive."""
     return await to_thread(gem.heartbeat, jsonify=jsonify)
 

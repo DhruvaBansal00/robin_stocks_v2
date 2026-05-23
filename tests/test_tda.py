@@ -1,24 +1,24 @@
 import os
 
-import robin_stocks.tda as t
 from dotenv import load_dotenv
+
+import robin_stocks.tda as t
 
 load_dotenv()
 
 
 class TestAuthentication:
-
     def test_login(self):
-        t.login(os.environ['tda_encryption_passcode'])
+        t.login(os.environ["tda_encryption_passcode"])
         assert t.get_login_state()
 
-class TestStocks:
 
+class TestStocks:
     ticker = "TSLA"
 
     @classmethod
     def setup_class(cls):
-        t.login(os.environ['tda_encryption_passcode'])
+        t.login(os.environ["tda_encryption_passcode"])
 
     def test_quote(self):
         resp, err = t.get_quote(self.ticker)
@@ -26,4 +26,3 @@ class TestStocks:
         assert resp.status_code == 200
         assert err is None
         assert self.ticker in data
-

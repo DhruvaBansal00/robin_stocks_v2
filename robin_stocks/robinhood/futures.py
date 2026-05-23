@@ -1,15 +1,17 @@
 """Contains functions for getting futures information."""
-from robin_stocks.robinhood.helper import (
-    login_required, filter_data, request_get, update_session_for_futures,
-    id_for_futures_contract, get_output
-)
-from robin_stocks.robinhood.urls import (
-    futures_contract_url, futures_quotes_url, futures_orders_url,
-    futures_account_url
-)
 
+from robin_stocks.robinhood.helper import (
+    filter_data,
+    get_output,
+    id_for_futures_contract,
+    login_required,
+    request_get,
+    update_session_for_futures,
+)
+from robin_stocks.robinhood.urls import futures_account_url, futures_contract_url, futures_orders_url, futures_quotes_url
 
 # Contract Functions
+
 
 @login_required
 def get_futures_contract(symbol, info=None):
@@ -38,8 +40,8 @@ def get_futures_contract(symbol, info=None):
     update_session_for_futures()
     data = request_get(url)
 
-    if data and 'result' in data:
-        return filter_data(data['result'], info)
+    if data and "result" in data:
+        return filter_data(data["result"], info)
     return None
 
 
@@ -67,6 +69,7 @@ def get_futures_contracts_by_symbols(symbols, info=None):
 
 
 # Quote Functions
+
 
 @login_required
 def get_futures_quote(symbol, info=None):
@@ -121,15 +124,15 @@ def get_futures_quotes(symbols, info=None):
 
     # Build URL with multiple IDs
     url = futures_quotes_url()
-    ids_param = ','.join(contract_ids)
-    payload = {'ids': ids_param}
+    ids_param = ",".join(contract_ids)
+    payload = {"ids": ids_param}
 
     update_session_for_futures()
     data = request_get(url, payload=payload)
 
     # Futures quotes API returns {data: [{data: {...}}]}
-    if data and 'data' in data:
-        quotes = [item['data'] for item in data['data'] if 'data' in item]
+    if data and "data" in data:
+        quotes = [item["data"] for item in data["data"] if "data" in item]
         return filter_data(quotes, info)
     return []
 
@@ -146,20 +149,21 @@ def get_futures_quote_by_id(contract_id, info=None):
 
     """
     url = futures_quotes_url()
-    payload = {'ids': contract_id}
+    payload = {"ids": contract_id}
 
     update_session_for_futures()
     data = request_get(url, payload=payload)
 
     # Futures quotes API returns {data: [{data: {...}}]}
-    if data and 'data' in data and len(data['data']) > 0:
-        quote_data = data['data'][0].get('data')
+    if data and "data" in data and len(data["data"]) > 0:
+        quote_data = data["data"][0].get("data")
         if quote_data:
             return filter_data(quote_data, info)
     return None
 
 
 # Order Functions
+
 
 @login_required
 def get_all_futures_orders(account_id=None, info=None):
@@ -205,25 +209,25 @@ def get_all_futures_orders(account_id=None, info=None):
     update_session_for_futures()
 
     while True:
-        payload = {'contractType': 'OUTRIGHT'}
+        payload = {"contractType": "OUTRIGHT"}
         if cursor:
-            payload['cursor'] = cursor
+            payload["cursor"] = cursor
 
         url = futures_orders_url(account_id)
         data = request_get(url, payload=payload)
 
-        if not data or 'results' not in data:
+        if not data or "results" not in data:
             break
 
-        results = data['results']
+        results = data["results"]
         all_orders.extend(results)
 
         # Check for next page
-        cursor = data.get('next')
+        cursor = data.get("next")
         if not cursor:
             break
 
-        print(f'Loading page {page + 1} ...', file=get_output())
+        print(f"Loading page {page + 1} ...", file=get_output())
         page += 1
 
     return filter_data(all_orders, info)
@@ -247,7 +251,7 @@ def get_futures_order_info(order_id, account_id=None, info=None):
         return None
 
     for order in all_orders:
-        if order.get('orderId') == order_id:
+        if order.get("orderId") == order_id:
             return filter_data(order, info)
 
     return None
@@ -278,31 +282,32 @@ def get_filled_futures_orders(account_id=None, info=None):
     update_session_for_futures()
 
     while True:
-        payload = {'contractType': 'OUTRIGHT', 'orderState': 'FILLED'}
+        payload = {"contractType": "OUTRIGHT", "orderState": "FILLED"}
         if cursor:
-            payload['cursor'] = cursor
+            payload["cursor"] = cursor
 
         url = futures_orders_url(account_id)
         data = request_get(url, payload=payload)
 
-        if not data or 'results' not in data:
+        if not data or "results" not in data:
             break
 
-        results = data['results']
+        results = data["results"]
         all_orders.extend(results)
 
         # Check for next page
-        cursor = data.get('next')
+        cursor = data.get("next")
         if not cursor:
             break
 
-        print(f'Loading page {page + 1} ...', file=get_output())
+        print(f"Loading page {page + 1} ...", file=get_output())
         page += 1
 
     return filter_data(all_orders, info)
 
 
 # P&L Helper Functions
+
 
 def _extract_amount(field):
     """Extract numeric amount from nested futures amount structure.
@@ -318,8 +323,8 @@ def _extract_amount(field):
         return float(field)
     if isinstance(field, str):
         return float(field) if field else 0.0
-    if isinstance(field, dict) and 'amount' in field:
-        amount = field['amount']
+    if isinstance(field, dict) and "amount" in field:
+        amount = field["amount"]
         return float(amount) if amount else 0.0
     return 0.0
 
@@ -341,32 +346,32 @@ def extract_futures_pnl(order):
 
     """
     pnl_data = {
-        'realized_pnl': 0.0,
-        'realized_pnl_without_fees': 0.0,
-        'total_fee': 0.0,
-        'total_commission': 0.0,
-        'total_gold_savings': 0.0
+        "realized_pnl": 0.0,
+        "realized_pnl_without_fees": 0.0,
+        "total_fee": 0.0,
+        "total_commission": 0.0,
+        "total_gold_savings": 0.0,
     }
 
     if not order:
         return pnl_data
 
     # Extract nested P&L (double-nested structure)
-    if 'realizedPnl' in order and order['realizedPnl']:
-        realized_pnl_obj = order['realizedPnl']
+    if "realizedPnl" in order and order["realizedPnl"]:
+        realized_pnl_obj = order["realizedPnl"]
         if isinstance(realized_pnl_obj, dict):
-            if 'realizedPnl' in realized_pnl_obj:
-                pnl_data['realized_pnl'] = _extract_amount(realized_pnl_obj['realizedPnl'])
-            if 'realizedPnlWithoutFees' in realized_pnl_obj:
-                pnl_data['realized_pnl_without_fees'] = _extract_amount(realized_pnl_obj['realizedPnlWithoutFees'])
+            if "realizedPnl" in realized_pnl_obj:
+                pnl_data["realized_pnl"] = _extract_amount(realized_pnl_obj["realizedPnl"])
+            if "realizedPnlWithoutFees" in realized_pnl_obj:
+                pnl_data["realized_pnl_without_fees"] = _extract_amount(realized_pnl_obj["realizedPnlWithoutFees"])
 
     # Extract fees
-    if 'totalFee' in order:
-        pnl_data['total_fee'] = _extract_amount(order['totalFee'])
-    if 'totalCommission' in order:
-        pnl_data['total_commission'] = _extract_amount(order['totalCommission'])
-    if 'totalGoldSavings' in order:
-        pnl_data['total_gold_savings'] = _extract_amount(order['totalGoldSavings'])
+    if "totalFee" in order:
+        pnl_data["total_fee"] = _extract_amount(order["totalFee"])
+    if "totalCommission" in order:
+        pnl_data["total_commission"] = _extract_amount(order["totalCommission"])
+    if "totalGoldSavings" in order:
+        pnl_data["total_gold_savings"] = _extract_amount(order["totalGoldSavings"])
 
     return pnl_data
 
@@ -389,12 +394,12 @@ def calculate_total_futures_pnl(orders):
 
     """
     totals = {
-        'total_pnl': 0.0,
-        'total_pnl_without_fees': 0.0,
-        'total_fees': 0.0,
-        'total_commissions': 0.0,
-        'total_gold_savings': 0.0,
-        'num_orders': 0
+        "total_pnl": 0.0,
+        "total_pnl_without_fees": 0.0,
+        "total_fees": 0.0,
+        "total_commissions": 0.0,
+        "total_gold_savings": 0.0,
+        "num_orders": 0,
     }
 
     if not orders:
@@ -404,22 +409,23 @@ def calculate_total_futures_pnl(orders):
         # Only count P&L from CLOSING orders to avoid double-counting
         # OPENING orders have realizedPnl = -fees (just the cost to open)
         # CLOSING orders have realizedPnl = actual position P&L
-        position_effect = order.get('positionEffectAtPlacementTime', '')
-        if position_effect != 'CLOSING':
+        position_effect = order.get("positionEffectAtPlacementTime", "")
+        if position_effect != "CLOSING":
             continue
 
         pnl = extract_futures_pnl(order)
-        totals['total_pnl'] += pnl['realized_pnl']
-        totals['total_pnl_without_fees'] += pnl['realized_pnl_without_fees']
-        totals['total_fees'] += pnl['total_fee']
-        totals['total_commissions'] += pnl['total_commission']
-        totals['total_gold_savings'] += pnl['total_gold_savings']
-        totals['num_orders'] += 1
+        totals["total_pnl"] += pnl["realized_pnl"]
+        totals["total_pnl_without_fees"] += pnl["realized_pnl_without_fees"]
+        totals["total_fees"] += pnl["total_fee"]
+        totals["total_commissions"] += pnl["total_commission"]
+        totals["total_gold_savings"] += pnl["total_gold_savings"]
+        totals["num_orders"] += 1
 
     return totals
 
 
 # Account Functions (Placeholders)
+
 
 @login_required
 def get_futures_account_id():
@@ -430,13 +436,13 @@ def get_futures_account_id():
     """
     url = futures_account_url()
     update_session_for_futures()
-    data = request_get(url, dataType='results')
+    data = request_get(url, dataType="results")
 
     # Filter for the account with accountType='FUTURES'
     if data and len(data) > 0:
         for account in data:
-            if isinstance(account, dict) and account.get('accountType') == 'FUTURES':
-                return account.get('id')
+            if isinstance(account, dict) and account.get("accountType") == "FUTURES":
+                return account.get("id")
 
     return None
 

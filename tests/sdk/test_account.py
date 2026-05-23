@@ -123,9 +123,11 @@ def test_get_tax_lots_returns_list_none_for_bad_symbol_type(rg) -> None:
 
 def test_get_tax_lots_calls_request_get_with_open_url(rg) -> None:
     rg.return_value = [{"open_lot_id": "L1"}]
-    with patch("robin_stocks.robinhood.account.load_account_profile", return_value="ACC"), \
-         patch("robin_stocks.robinhood.account.get_instruments_by_symbols", return_value=["inst-1"]), \
-         patch("robin_stocks.robinhood.account.get_latest_price", return_value=["100.00"]):
+    with (
+        patch("robin_stocks.robinhood.account.load_account_profile", return_value="ACC"),
+        patch("robin_stocks.robinhood.account.get_instruments_by_symbols", return_value=["inst-1"]),
+        patch("robin_stocks.robinhood.account.get_latest_price", return_value=["100.00"]),
+    ):
         out = account.get_tax_lots("AAPL")
     rg.assert_called_once()
     url = rg.call_args[0][0]
@@ -136,9 +138,11 @@ def test_get_tax_lots_calls_request_get_with_open_url(rg) -> None:
 def test_get_tax_lots_omits_price_when_unavailable(rg) -> None:
     """When get_latest_price returns no usable value, the price key is not sent."""
     rg.return_value = []
-    with patch("robin_stocks.robinhood.account.load_account_profile", return_value="ACC"), \
-         patch("robin_stocks.robinhood.account.get_instruments_by_symbols", return_value=["inst-1"]), \
-         patch("robin_stocks.robinhood.account.get_latest_price", return_value=[None]):
+    with (
+        patch("robin_stocks.robinhood.account.load_account_profile", return_value="ACC"),
+        patch("robin_stocks.robinhood.account.get_instruments_by_symbols", return_value=["inst-1"]),
+        patch("robin_stocks.robinhood.account.get_latest_price", return_value=[None]),
+    ):
         account.get_tax_lots("AAPL")
     payload = rg.call_args[0][2]
     assert "price" not in payload
@@ -278,13 +282,14 @@ def test_get_card_transactions_with_card_type(rg) -> None:
 
 
 @pytest.mark.parametrize(
-    "fn", [
+    "fn",
+    [
         account.get_stock_loan_payments,
         account.get_interest_payments,
         account.get_margin_interest,
         account.get_subscription_fees,
         account.get_referrals,
-    ]
+    ],
 )
 def test_payment_endpoints_use_pagination(fn, rg) -> None:
     rg.return_value = [{"x": 1}]
@@ -330,12 +335,15 @@ def test_get_watchlist_by_name_makes_request(rg) -> None:
 
 def test_post_symbols_to_watchlist_calls_request_post(rp) -> None:
     rp.return_value = {"results": []}
-    with patch(
-        "robin_stocks.robinhood.account.get_all_watchlists",
-        return_value={"results": [{"display_name": "MyList", "id": "wl-1"}]},
-    ), patch(
-        "robin_stocks.robinhood.account.get_instruments_by_symbols",
-        return_value=["inst-1"],
+    with (
+        patch(
+            "robin_stocks.robinhood.account.get_all_watchlists",
+            return_value={"results": [{"display_name": "MyList", "id": "wl-1"}]},
+        ),
+        patch(
+            "robin_stocks.robinhood.account.get_instruments_by_symbols",
+            return_value=["inst-1"],
+        ),
     ):
         account.post_symbols_to_watchlist("AAPL", name="MyList")
     rp.assert_called_once()
@@ -346,12 +354,15 @@ def test_delete_symbols_from_watchlist_walks_watchlist_results(rd, rg) -> None:
     rg.return_value = [
         {"object": {"id": "inst-1"}, "instrument": "https://api/i/inst-1/", "object_type": "instrument"},
     ]
-    with patch(
-        "robin_stocks.robinhood.account.get_all_watchlists",
-        return_value={"results": [{"display_name": "MyList", "id": "wl-1"}]},
-    ), patch(
-        "robin_stocks.robinhood.account.get_instruments_by_symbols",
-        return_value=["inst-1"],
+    with (
+        patch(
+            "robin_stocks.robinhood.account.get_all_watchlists",
+            return_value={"results": [{"display_name": "MyList", "id": "wl-1"}]},
+        ),
+        patch(
+            "robin_stocks.robinhood.account.get_instruments_by_symbols",
+            return_value=["inst-1"],
+        ),
     ):
         try:
             account.delete_symbols_from_watchlist("AAPL", name="MyList")
@@ -367,19 +378,34 @@ def test_delete_symbols_from_watchlist_walks_watchlist_results(rd, rg) -> None:
 
 def test_build_holdings_returns_dict() -> None:
     """Mocks the underlying data sources and confirms build_holdings produces a dict."""
-    with patch("robin_stocks.robinhood.account.get_open_stock_positions", return_value=[]), \
-         patch("robin_stocks.robinhood.account.load_phoenix_account", return_value={"market_value": {"amount": "0"}}):
+    with (
+        patch("robin_stocks.robinhood.account.get_open_stock_positions", return_value=[]),
+        patch("robin_stocks.robinhood.account.load_phoenix_account", return_value={"market_value": {"amount": "0"}}),
+    ):
         out = account.build_holdings()
     assert isinstance(out, dict)
 
 
 def test_build_user_profile_returns_dict() -> None:
     """build_user_profile composes account + portfolio + dividend data."""
-    with patch("robin_stocks.robinhood.account.load_account_profile",
-              return_value={"account_number": "ACC", "cash": "10", "buying_power": "10", "uncleared_deposits": "0", "unsettled_funds": "0", "uncleared_deposits_alternative": "0"}), \
-         patch("robin_stocks.robinhood.account.load_portfolio_profile",
-              return_value={"equity": "100", "extended_hours_equity": "100", "market_value": "100"}), \
-         patch("robin_stocks.robinhood.account.get_total_dividends", return_value=0.0):
+    with (
+        patch(
+            "robin_stocks.robinhood.account.load_account_profile",
+            return_value={
+                "account_number": "ACC",
+                "cash": "10",
+                "buying_power": "10",
+                "uncleared_deposits": "0",
+                "unsettled_funds": "0",
+                "uncleared_deposits_alternative": "0",
+            },
+        ),
+        patch(
+            "robin_stocks.robinhood.account.load_portfolio_profile",
+            return_value={"equity": "100", "extended_hours_equity": "100", "market_value": "100"},
+        ),
+        patch("robin_stocks.robinhood.account.get_total_dividends", return_value=0.0),
+    ):
         try:
             out = account.build_user_profile()
             assert isinstance(out, dict)
@@ -400,9 +426,7 @@ def test_download_document_creates_file(tmp_path) -> None:
     mock_res.content = b"fake pdf bytes"
 
     with patch("robin_stocks.robinhood.account.request_document", return_value=mock_res):
-        account.download_document(
-            "https://api/doc/1/", name="testdoc", dirpath=str(tmp_path)
-        )
+        account.download_document("https://api/doc/1/", name="testdoc", dirpath=str(tmp_path))
     # The function may write under any subdirectory layout — just confirm
     # something landed on disk. (If it didn't, the function may have early-exited.)
     pdfs = list(tmp_path.rglob("*.pdf"))

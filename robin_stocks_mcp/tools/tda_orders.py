@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 import robin_stocks.tda as tda
 
@@ -12,27 +12,21 @@ from ..runtime import safe_tool, to_thread
 
 @mcp.tool()
 @safe_tool(write=True)
-async def tda_place_order(
-    account_id: str, order_payload: dict, jsonify: Optional[bool] = None
-) -> Any:
+async def tda_place_order(account_id: str, order_payload: dict, jsonify: bool | None = None) -> Any:
     """Place an order on a TDA account. `order_payload` follows the TDA Orders API schema."""
     return await to_thread(tda.place_order, account_id, order_payload, jsonify=jsonify)
 
 
 @mcp.tool()
 @safe_tool(write=True)
-async def tda_cancel_order(
-    account_id: str, order_id: str, jsonify: Optional[bool] = None
-) -> Any:
+async def tda_cancel_order(account_id: str, order_id: str, jsonify: bool | None = None) -> Any:
     """Cancel an existing TDA order."""
     return await to_thread(tda.cancel_order, account_id, order_id, jsonify=jsonify)
 
 
 @mcp.tool()
 @safe_tool()
-async def tda_get_order(
-    account_id: str, order_id: str, jsonify: Optional[bool] = None
-) -> Any:
+async def tda_get_order(account_id: str, order_id: str, jsonify: bool | None = None) -> Any:
     """Get information about a single TDA order."""
     return await to_thread(tda.get_order, account_id, order_id, jsonify=jsonify)
 
@@ -41,11 +35,11 @@ async def tda_get_order(
 @safe_tool()
 async def tda_get_orders_for_account(
     account_id: str,
-    max_results: Optional[int] = None,
-    from_time: Optional[str] = None,
-    to_time: Optional[str] = None,
-    status: Optional[str] = None,
-    jsonify: Optional[bool] = None,
+    max_results: int | None = None,
+    from_time: str | None = None,
+    to_time: str | None = None,
+    status: str | None = None,
+    jsonify: bool | None = None,
 ) -> Any:
     """List orders on a TDA account, optionally filtered."""
     return await to_thread(

@@ -38,17 +38,24 @@ def get_quotes(tickers, jsonify=None):
 
     """
     url = URLS.quotes()
-    payload = {
-        "symbol": tickers
-    }
+    payload = {"symbol": tickers}
     data, error = request_get(url, payload, jsonify)
     return data, error
 
 
 @login_required
 @format_inputs
-def get_price_history(ticker, period_type, frequency_type, frequency,
-                      period=None, start_date=None, end_date=None, needExtendedHoursData=True, jsonify=None):
+def get_price_history(
+    ticker,
+    period_type,
+    frequency_type,
+    frequency,
+    period=None,
+    start_date=None,
+    end_date=None,
+    needExtendedHoursData=True,
+    jsonify=None,
+):
     """ Gets the price history of a stock.
 
     :param ticker: The stock ticker.
@@ -58,8 +65,8 @@ def get_price_history(ticker, period_type, frequency_type, frequency,
     :param frequency_type: The type of frequency with which a new candle is formed. \
         Valid frequencyTypes by period_type (defaults marked with an asterisk):\n
         * day: minute*
-        * month: daily, weekly* 
-        * year: daily, weekly, monthly* 
+        * month: daily, weekly*
+        * year: daily, weekly, monthly*
         * ytd: daily, weekly*
     :type frequency_type: str
     :param frequency: The number of the frequencyType to be included in each candle. \
@@ -90,14 +97,13 @@ def get_price_history(ticker, period_type, frequency_type, frequency,
 
     """
     if (start_date or end_date) and period:
-        raise ValueError(
-            "If start_date and end_date are provided, period should not be provided.")
+        raise ValueError("If start_date and end_date are provided, period should not be provided.")
     url = URLS.price_history(ticker)
     payload = {
         "periodType": period_type,
         "frequencyType": frequency_type,
         "frequency": frequency,
-        "needExtendedHoursData": needExtendedHoursData
+        "needExtendedHoursData": needExtendedHoursData,
     }
     if period:
         payload["period"] = period
@@ -132,10 +138,7 @@ def search_instruments(ticker_string, projection, jsonify=None):
 
     """
     url = URLS.instruments()
-    payload = {
-        "symbol": ticker_string,
-        "projection": projection
-    }
+    payload = {"symbol": ticker_string, "projection": projection}
     data, error = request_get(url, payload, jsonify)
     return data, error
 
@@ -162,9 +165,25 @@ def get_instrument(cusip, jsonify=None):
 
 @login_required
 @format_inputs
-def get_option_chains(ticker, contract_type="ALL", strike_count="10", include_quotes="FALSE", strategy="SINGLE", interval=None, strike_price=None,
-                      range_value="ALL", from_date=None, to_date=None, volatility=None, underlying_price=None, interest_rate=None, 
-                      days_to_expiration=None, exp_month="ALL", option_type="ALL", jsonify=None):
+def get_option_chains(
+    ticker,
+    contract_type="ALL",
+    strike_count="10",
+    include_quotes="FALSE",
+    strategy="SINGLE",
+    interval=None,
+    strike_price=None,
+    range_value="ALL",
+    from_date=None,
+    to_date=None,
+    volatility=None,
+    underlying_price=None,
+    interest_rate=None,
+    days_to_expiration=None,
+    exp_month="ALL",
+    option_type="ALL",
+    jsonify=None,
+):
     """ Gets instrument data for a specific stock.
 
     :param ticker: The stock ticker.
@@ -230,7 +249,7 @@ def get_option_chains(ticker, contract_type="ALL", strike_count="10", include_qu
         "strategy": strategy,
         "range": range_value,
         "expMonth": exp_month,
-        "optionType": option_type
+        "optionType": option_type,
     }
     if interval:
         payload["interval"] = interval
@@ -238,7 +257,7 @@ def get_option_chains(ticker, contract_type="ALL", strike_count="10", include_qu
         payload["strike"] = strike_price
     if from_date:
         payload["fromDate"] = from_date
-    if to_date: 
+    if to_date:
         payload["toDate"] = to_date
     if volatility:
         payload["volatility"] = volatility

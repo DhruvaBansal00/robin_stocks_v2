@@ -63,8 +63,10 @@ async def test_tda_login_dispatches() -> None:
 async def test_tda_login_first_time_dispatches() -> None:
     with patch("robin_stocks.tda.login_first_time") as m:
         out = await get_fn("tda_login_first_time")(
-            encryption_passcode="pc", client_id="cid",
-            authorization_token="auth", refresh_token="ref",
+            encryption_passcode="pc",
+            client_id="cid",
+            authorization_token="auth",
+            refresh_token="ref",
         )
         m.assert_called_once_with("pc", "cid", "auth", "ref")
         assert "saved" in out

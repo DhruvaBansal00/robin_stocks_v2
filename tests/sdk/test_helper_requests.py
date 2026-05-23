@@ -258,16 +258,20 @@ def test_id_for_option_returns_matching_option_id() -> None:
         {"expiration_date": "2026-06-19", "id": "wrong"},
         {"expiration_date": "2026-09-18", "id": "match"},
     ]
-    with patch("robin_stocks.robinhood.helper.id_for_chain", return_value="chain-id"), \
-         patch("robin_stocks.robinhood.helper.request_get", return_value=data):
+    with (
+        patch("robin_stocks.robinhood.helper.id_for_chain", return_value="chain-id"),
+        patch("robin_stocks.robinhood.helper.request_get", return_value=data),
+    ):
         out = helper.id_for_option("AAPL", "2026-09-18", "150", "call")
     assert out == "match"
 
 
 def test_id_for_option_returns_none_when_no_match() -> None:
     data = [{"expiration_date": "2026-06-19", "id": "x"}]
-    with patch("robin_stocks.robinhood.helper.id_for_chain", return_value="chain-id"), \
-         patch("robin_stocks.robinhood.helper.request_get", return_value=data):
+    with (
+        patch("robin_stocks.robinhood.helper.id_for_chain", return_value="chain-id"),
+        patch("robin_stocks.robinhood.helper.request_get", return_value=data),
+    ):
         out = helper.id_for_option("AAPL", "2099-01-01", "999", "call")
     assert out is None
 
@@ -279,6 +283,7 @@ def test_id_for_option_returns_none_when_no_match() -> None:
 
 def test_set_and_get_output_roundtrip() -> None:
     import io
+
     sink = io.StringIO()
     original = helper.get_output()
     try:
@@ -321,6 +326,7 @@ def test_convert_none_to_string_passes_through_truthy() -> None:
     @helper.convert_none_to_string
     def gimme():
         return "value"
+
     assert gimme() == "value"
 
 
@@ -328,4 +334,5 @@ def test_convert_none_to_string_replaces_none_with_empty() -> None:
     @helper.convert_none_to_string
     def gimme():
         return None
+
     assert gimme() == ""

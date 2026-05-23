@@ -79,9 +79,7 @@ async def test_rh_get_index_quote_by_id_dispatches() -> None:
 async def test_rh_find_tradable_options_dispatches() -> None:
     with patch("robin_stocks.robinhood.find_tradable_options", return_value=[]) as m:
         await get_fn("rh_find_tradable_options")(symbol="AAPL", expirationDate="2026-06-19")
-        m.assert_called_once_with(
-            "AAPL", expirationDate="2026-06-19", strikePrice=None, optionType=None, info=None
-        )
+        m.assert_called_once_with("AAPL", expirationDate="2026-06-19", strikePrice=None, optionType=None, info=None)
 
 
 @pytest.mark.asyncio
@@ -121,9 +119,7 @@ async def test_rh_get_closed_tax_lots_dispatches() -> None:
 @pytest.mark.asyncio
 async def test_rh_order_sell_tax_lot_blocked_when_read_only(writes_disabled) -> None:
     with patch("robin_stocks.robinhood.order_sell_tax_lot") as m:
-        out = await get_fn("rh_order_sell_tax_lot")(
-            symbol="AAPL", lots=[{"open_lot_id": "L1", "quantity": "1"}]
-        )
+        out = await get_fn("rh_order_sell_tax_lot")(symbol="AAPL", lots=[{"open_lot_id": "L1", "quantity": "1"}])
         assert out["error"] is True
         assert out["type"] == "ReadOnlyError"
         m.assert_not_called()

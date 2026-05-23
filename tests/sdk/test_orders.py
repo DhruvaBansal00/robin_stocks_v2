@@ -21,7 +21,10 @@ def mocked_order_deps():
     patches = [
         patch("robin_stocks.robinhood.orders.request_post", return_value={"id": "ord-1"}),
         patch("robin_stocks.robinhood.orders.load_account_profile", return_value="https://api.robinhood.com/accounts/acct/"),
-        patch("robin_stocks.robinhood.orders.get_instruments_by_symbols", return_value=[{"id": "inst-1", "url": "https://api.robinhood.com/instruments/inst-1/"}]),
+        patch(
+            "robin_stocks.robinhood.orders.get_instruments_by_symbols",
+            return_value=[{"id": "inst-1", "url": "https://api.robinhood.com/instruments/inst-1/"}],
+        ),
         patch("robin_stocks.robinhood.orders.get_latest_price", return_value=["100.00"]),
         # login_required decorator
         patch("robin_stocks.robinhood.helper.LOGGED_IN", True),
@@ -43,7 +46,9 @@ def test_order_with_extended_hours_true_and_regular_hours_upgrades_market_hours(
     payload kept market_hours='regular_hours' and the extended-hours flag
     was silently ignored by Robinhood's matching engine."""
     orders.order(
-        "AAPL", 1, "buy",
+        "AAPL",
+        1,
+        "buy",
         extendedHours=True,
         market_hours="regular_hours",
     )
@@ -55,7 +60,9 @@ def test_order_with_extended_hours_true_and_regular_hours_upgrades_market_hours(
 def test_order_with_extended_hours_false_keeps_regular_hours(mocked_order_deps) -> None:
     """No auto-upgrade when extendedHours is False."""
     orders.order(
-        "AAPL", 1, "buy",
+        "AAPL",
+        1,
+        "buy",
         extendedHours=False,
         market_hours="regular_hours",
     )
@@ -67,7 +74,9 @@ def test_order_with_extended_hours_false_keeps_regular_hours(mocked_order_deps) 
 def test_order_with_extended_hours_true_and_already_extended_no_change(mocked_order_deps) -> None:
     """If the caller already set market_hours='extended_hours', leave it alone."""
     orders.order(
-        "AAPL", 1, "buy",
+        "AAPL",
+        1,
+        "buy",
         extendedHours=True,
         market_hours="extended_hours",
     )
@@ -78,7 +87,9 @@ def test_order_with_extended_hours_true_and_already_extended_no_change(mocked_or
 def test_order_with_extended_hours_true_and_all_day_hours_no_change(mocked_order_deps) -> None:
     """all_day_hours should not be downgraded just because extendedHours=True."""
     orders.order(
-        "AAPL", 1, "buy",
+        "AAPL",
+        1,
+        "buy",
         extendedHours=True,
         market_hours="all_day_hours",
     )
@@ -96,9 +107,21 @@ def test_order_market_buy_payload_keys(mocked_order_deps) -> None:
     orders.order("AAPL", 1, "buy")
     payload = mocked_order_deps["request_post"].call_args[0][1]
     expected = {
-        "account", "instrument", "symbol", "price", "ask_price",
-        "bid_ask_timestamp", "bid_price", "quantity", "ref_id", "type",
-        "time_in_force", "trigger", "side", "market_hours", "extended_hours",
+        "account",
+        "instrument",
+        "symbol",
+        "price",
+        "ask_price",
+        "bid_ask_timestamp",
+        "bid_price",
+        "quantity",
+        "ref_id",
+        "type",
+        "time_in_force",
+        "trigger",
+        "side",
+        "market_hours",
+        "extended_hours",
         "order_form_version",
     }
     assert expected.issubset(payload.keys())

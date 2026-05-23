@@ -1,11 +1,12 @@
 """Contains functions for managing recurring investments."""
+
 from datetime import datetime
 
+from robin_stocks.robinhood.globals import SESSION
 from robin_stocks.robinhood.helper import *
 from robin_stocks.robinhood.profiles import *
 from robin_stocks.robinhood.stocks import *
 from robin_stocks.robinhood.urls import *
-from robin_stocks.robinhood.globals import SESSION
 
 
 @login_required
@@ -25,13 +26,14 @@ def get_recurring_investments(info=None, account_number=None, asset_types=None, 
 
     """
     url = recurring_schedules_url(account_number=account_number, asset_types=asset_types)
-    data = request_get(url, 'pagination', jsonify_data=jsonify)
-    return(filter_data(data, info))
+    data = request_get(url, "pagination", jsonify_data=jsonify)
+    return filter_data(data, info)
 
 
 @login_required
-def create_recurring_investment(symbol, amount, frequency='weekly', start_date=None, 
-                                account_number=None, source_of_funds='buying_power', jsonify=True):
+def create_recurring_investment(
+    symbol, amount, frequency="weekly", start_date=None, account_number=None, source_of_funds="buying_power", jsonify=True
+):
     """Creates a new recurring investment schedule.
 
     :param symbol: Stock or ETF symbol to invest in.
@@ -53,83 +55,80 @@ def create_recurring_investment(symbol, amount, frequency='weekly', start_date=N
     """
     if not account_number:
         account_data = load_account_profile(account_number=account_number)
-        account_number = account_data.get('account_number')
-    
+        account_number = account_data.get("account_number")
+
     if not account_number:
         print("ERROR: Could not get account number", file=get_output())
         return None
-    
+
     # Get instrument ID
     instrument_data = get_instruments_by_symbols(symbol)
     if not instrument_data:
         print(f"ERROR: Could not find instrument for {symbol}", file=get_output())
         return None
-    
-    instrument_id = instrument_data[0].get('id')
+
+    instrument_id = instrument_data[0].get("id")
     if not instrument_id:
         print(f"ERROR: Could not get instrument ID for {symbol}", file=get_output())
         return None
-    
+
     # Format start date
     if not start_date:
-        start_date = datetime.now().strftime('%Y-%m-%d')
-    
+        start_date = datetime.now().strftime("%Y-%m-%d")
+
     # Build payload - matching Robinhood's actual format from network capture
     import uuid
+
     payload = {
         "account_number": account_number,
         "ach_relationship_id": None,
-        "amount": {
-            "amount": str(amount),
-            "currency_code": "USD"
-        },
+        "amount": {"amount": str(amount), "currency_code": "USD"},
         "direct_deposit_relationship_id": None,
         "frequency": frequency,
-        "investment_asset": {
-            "asset_id": instrument_id,
-            "asset_symbol": symbol.upper(),
-            "asset_type": "equity"
-        },
+        "investment_asset": {"asset_id": instrument_id, "asset_symbol": symbol.upper(), "asset_type": "equity"},
         "is_backup_ach_enabled": False,
         "percentage_of_direct_deposit": None,
         "ref_id": str(uuid.uuid4()),
         "source_of_funds": source_of_funds,
-        "start_date": start_date
+        "start_date": start_date,
     }
-    
+
     url = recurring_schedules_url(account_number=account_number)
-    
+
     # Use request_post with jsonify=False to get the response object for better error handling
     response = request_post(url, payload, json=True, jsonify_data=False)
-    
+
     if response is None:
         print(f"ERROR: request_post returned None for {symbol}", file=get_output())
         return None
-    
+
     # Check status code
     if response.status_code not in [200, 201]:
         try:
             error_data = response.json()
-            error_msg = error_data.get('detail', error_data.get('error', error_data.get('message', f"HTTP {response.status_code}")))
+            error_msg = error_data.get(
+                "detail", error_data.get("error", error_data.get("message", f"HTTP {response.status_code}"))
+            )
             if isinstance(error_msg, dict):
                 error_msg = str(error_msg)
             print(f"ERROR: Failed to create recurring investment for {symbol}: {error_msg}", file=get_output())
-        except Exception as e:
+        except Exception:
             print(f"ERROR: Failed to create recurring investment for {symbol}: HTTP {response.status_code}", file=get_output())
         return None
-    
+
     # Parse successful response
     try:
         data = response.json()
         return data
-    except:
+    except Exception:
         print(f"ERROR: Could not parse response for {symbol}", file=get_output())
         return None
 
 
 @login_required
-def update_recurring_investment(schedule_id, account_number=None, amount=None, 
-                                frequency=None, state=None, start_date=None, jsonify=True):
+def update_recurring_investment(
+    schedule_id, account_number=None, amount=None, frequency=None, state=None, start_date=None, jsonify=True
+):
     """Updates an existing recurring investment.
 
     :param schedule_id: ID of the recurring investment to update.
@@ -151,53 +150,50 @@ def update_recurring_investment(schedule_id, account_number=None, amount=None,
     """
     if not account_number:
         account_data = load_account_profile(account_number=account_number)
-        account_number = account_data.get('account_number')
+        account_number = account_data.get("account_number")
         if not account_number:
             print("ERROR: Could not get account number", file=get_output())
             return None
-    
+
     # Build payload with only provided fields
     payload = {}
     if amount is not None:
-        payload["amount"] = {
-            "amount": str(amount),
-            "currency_code": "USD"
-        }
+        payload["amount"] = {"amount": str(amount), "currency_code": "USD"}
     if frequency is not None:
         payload["frequency"] = frequency
     if state is not None:
         payload["state"] = state
     if start_date is not None:
         payload["start_date"] = start_date
-    
+
     if not payload:
         print("ERROR: No fields to update", file=get_output())
         return None
-    
+
     # Robinhood uses PATCH for updates, not POST
     url = recurring_schedules_url(schedule_id=schedule_id)
-    
+
     # Use SESSION.patch() directly since request_post doesn't support PATCH
     # SESSION is already imported from globals at the top
     try:
         # Save original Content-Type
-        original_content_type = SESSION.headers.get('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8')
+        original_content_type = SESSION.headers.get("Content-Type", "application/x-www-form-urlencoded; charset=utf-8")
         # Set Content-Type to JSON for PATCH request
-        SESSION.headers['Content-Type'] = 'application/json'
+        SESSION.headers["Content-Type"] = "application/json"
         res = SESSION.patch(url, json=payload, timeout=16)
         # Restore original Content-Type
-        SESSION.headers['Content-Type'] = original_content_type
-        
+        SESSION.headers["Content-Type"] = original_content_type
+
         if res.status_code not in [200, 201, 202, 204]:
             error_msg = f"HTTP {res.status_code}"
             try:
                 error_data = res.json()
-                error_msg = error_data.get('detail', error_data.get('error', error_data.get('message', error_msg)))
-            except:
+                error_msg = error_data.get("detail", error_data.get("error", error_data.get("message", error_msg)))
+            except Exception:
                 pass
             print(f"Error updating recurring investment: {error_msg}", file=get_output())
             return None
-        
+
         if jsonify:
             return res.json()
         else:
@@ -224,21 +220,21 @@ def cancel_recurring_investment(schedule_id, jsonify=True):
     # Robinhood uses PATCH with state="deleted" instead of DELETE
     url = recurring_schedules_url(schedule_id=schedule_id)
     payload = {"state": "deleted"}
-    
+
     # Use SESSION.patch() directly since request_post doesn't support PATCH
     try:
         # Save original Content-Type
-        original_content_type = SESSION.headers.get('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8')
+        original_content_type = SESSION.headers.get("Content-Type", "application/x-www-form-urlencoded; charset=utf-8")
         # Set Content-Type to JSON for PATCH request
-        SESSION.headers['Content-Type'] = 'application/json'
+        SESSION.headers["Content-Type"] = "application/json"
         res = SESSION.patch(url, json=payload, timeout=16)
         # Restore original Content-Type
-        SESSION.headers['Content-Type'] = original_content_type
-        
+        SESSION.headers["Content-Type"] = original_content_type
+
         if res.status_code not in [200, 201, 202, 204]:
             print(f"Error canceling recurring investment: HTTP {res.status_code}", file=get_output())
             return None
-        
+
         if jsonify:
             return res.json()
         else:
@@ -249,7 +245,7 @@ def cancel_recurring_investment(schedule_id, jsonify=True):
 
 
 @login_required
-def get_next_investment_date(frequency='weekly', start_date=None, jsonify=True):
+def get_next_investment_date(frequency="weekly", start_date=None, jsonify=True):
     """Gets the next investment date for a given frequency and start date.
 
     :param frequency: Investment frequency - 'daily', 'weekly', 'biweekly', or 'monthly'.
@@ -262,9 +258,8 @@ def get_next_investment_date(frequency='weekly', start_date=None, jsonify=True):
 
     """
     if not start_date:
-        start_date = datetime.now().strftime('%Y-%m-%d')
-    
+        start_date = datetime.now().strftime("%Y-%m-%d")
+
     url = next_investment_date_url(frequency, start_date)
     data = request_get(url, jsonify_data=jsonify)
     return data
-

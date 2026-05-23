@@ -12,14 +12,13 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timedelta
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from cryptography.fernet import Fernet
 
 from robin_stocks.tda import authentication as tda_auth
 from robin_stocks.tda import globals as tda_globals
-
 
 # ---------------------------------------------------------------------------
 # Module constants
@@ -55,12 +54,8 @@ def test_generate_encryption_passcode_returns_fernet_usable_key() -> None:
 
 def test_login_first_time_writes_json_file(tmp_path, monkeypatch) -> None:
     """The file must be valid JSON (not pickle bytes)."""
-    monkeypatch.setattr(
-        "robin_stocks.tda.authentication.Path.home", lambda: tmp_path
-    )
-    monkeypatch.setattr(
-        "robin_stocks.tda.authentication.DATA_DIR_NAME", ".tokens"
-    )
+    monkeypatch.setattr("robin_stocks.tda.authentication.Path.home", lambda: tmp_path)
+    monkeypatch.setattr("robin_stocks.tda.authentication.DATA_DIR_NAME", ".tokens")
     passcode = tda_auth.generate_encryption_passcode()
     tda_auth.login_first_time(passcode, "client-1", "auth-tok", "refresh-tok")
 
@@ -127,9 +122,9 @@ def test_login_first_time_accepts_bytes_passcode(tmp_path, monkeypatch) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _seed_tda_session(tmp_path, monkeypatch, *,
-                       authorization_age=timedelta(seconds=0),
-                       refresh_age=timedelta(seconds=0)) -> str:
+def _seed_tda_session(
+    tmp_path, monkeypatch, *, authorization_age=timedelta(seconds=0), refresh_age=timedelta(seconds=0)
+) -> str:
     """Helper: write a TDA session file with controllable timestamps. Returns the passcode."""
     monkeypatch.setattr("robin_stocks.tda.authentication.Path.home", lambda: tmp_path)
     monkeypatch.setattr("robin_stocks.tda.authentication.DATA_DIR_NAME", ".tokens")
@@ -149,9 +144,11 @@ def _seed_tda_session(tmp_path, monkeypatch, *,
 def test_login_reads_session_and_no_refresh_when_recent(tmp_path, monkeypatch) -> None:
     passcode = _seed_tda_session(tmp_path, monkeypatch)
 
-    with patch("robin_stocks.tda.authentication.request_data") as rd, \
-         patch("robin_stocks.tda.authentication.update_session") as upd, \
-         patch("robin_stocks.tda.authentication.set_login_state") as state:
+    with (
+        patch("robin_stocks.tda.authentication.request_data") as rd,
+        patch("robin_stocks.tda.authentication.update_session") as upd,
+        patch("robin_stocks.tda.authentication.set_login_state") as state,
+    ):
         token = tda_auth.login(passcode)
 
     # No network call, since neither delta was exceeded
@@ -164,16 +161,19 @@ def test_login_reads_session_and_no_refresh_when_recent(tmp_path, monkeypatch) -
 
 def test_login_authorization_refresh_when_over_30_minutes(tmp_path, monkeypatch) -> None:
     passcode = _seed_tda_session(
-        tmp_path, monkeypatch,
+        tmp_path,
+        monkeypatch,
         authorization_age=timedelta(minutes=45),  # exceeds 30-min window
         refresh_age=timedelta(days=1),
     )
 
     new_data = {"access_token": "new-auth-tok"}
 
-    with patch("robin_stocks.tda.authentication.request_data", return_value=(new_data, None)) as rd, \
-         patch("robin_stocks.tda.authentication.update_session"), \
-         patch("robin_stocks.tda.authentication.set_login_state"):
+    with (
+        patch("robin_stocks.tda.authentication.request_data", return_value=(new_data, None)) as rd,
+        patch("robin_stocks.tda.authentication.update_session"),
+        patch("robin_stocks.tda.authentication.set_login_state"),
+    ):
         token = tda_auth.login(passcode)
 
     rd.assert_called_once()  # we DID request a new auth token
@@ -183,22 +183,26 @@ def test_login_authorization_refresh_when_over_30_minutes(tmp_path, monkeypatch)
     saved = json.loads((tmp_path / ".tokens" / "tda.json").read_text())
     cipher = Fernet(passcode.encode())
     import base64
+
     assert cipher.decrypt(base64.b64decode(saved["authorization_token"])).decode() == "new-auth-tok"
 
 
 def test_login_full_refresh_when_over_60_days(tmp_path, monkeypatch) -> None:
     """When the refresh token itself is stale, both tokens are rotated."""
     passcode = _seed_tda_session(
-        tmp_path, monkeypatch,
+        tmp_path,
+        monkeypatch,
         authorization_age=timedelta(days=61),
         refresh_age=timedelta(days=61),
     )
 
     new_data = {"access_token": "rotated-auth", "refresh_token": "rotated-refresh"}
 
-    with patch("robin_stocks.tda.authentication.request_data", return_value=(new_data, None)), \
-         patch("robin_stocks.tda.authentication.update_session"), \
-         patch("robin_stocks.tda.authentication.set_login_state"):
+    with (
+        patch("robin_stocks.tda.authentication.request_data", return_value=(new_data, None)),
+        patch("robin_stocks.tda.authentication.update_session"),
+        patch("robin_stocks.tda.authentication.set_login_state"),
+    ):
         token = tda_auth.login(passcode)
 
     assert token == "Bearer rotated-auth"
@@ -206,6 +210,7 @@ def test_login_full_refresh_when_over_60_days(tmp_path, monkeypatch) -> None:
     saved = json.loads((tmp_path / ".tokens" / "tda.json").read_text())
     cipher = Fernet(passcode.encode())
     import base64
+
     assert cipher.decrypt(base64.b64decode(saved["refresh_token"])).decode() == "rotated-refresh"
 
 
@@ -221,7 +226,8 @@ def test_login_raises_when_session_file_missing(tmp_path, monkeypatch) -> None:
 def test_login_raises_when_refresh_returns_no_tokens(tmp_path, monkeypatch) -> None:
     """If the API doesn't return new tokens after a 60-day refresh, login must abort."""
     passcode = _seed_tda_session(
-        tmp_path, monkeypatch,
+        tmp_path,
+        monkeypatch,
         authorization_age=timedelta(days=61),
         refresh_age=timedelta(days=61),
     )
@@ -235,7 +241,8 @@ def test_login_raises_when_refresh_returns_no_tokens(tmp_path, monkeypatch) -> N
 def test_login_raises_when_short_refresh_returns_no_token(tmp_path, monkeypatch) -> None:
     """30-minute refresh branch must also raise when API replies empty."""
     passcode = _seed_tda_session(
-        tmp_path, monkeypatch,
+        tmp_path,
+        monkeypatch,
         authorization_age=timedelta(minutes=45),
         refresh_age=timedelta(days=1),
     )
@@ -258,9 +265,11 @@ def test_login_roundtrip_no_refresh_required(tmp_path, monkeypatch) -> None:
     passcode = tda_auth.generate_encryption_passcode()
     tda_auth.login_first_time(passcode, "C-1", "AUTH-TOK", "REFRESH-TOK")
 
-    with patch("robin_stocks.tda.authentication.request_data") as rd, \
-         patch("robin_stocks.tda.authentication.update_session"), \
-         patch("robin_stocks.tda.authentication.set_login_state"):
+    with (
+        patch("robin_stocks.tda.authentication.request_data") as rd,
+        patch("robin_stocks.tda.authentication.update_session"),
+        patch("robin_stocks.tda.authentication.set_login_state"),
+    ):
         token = tda_auth.login(passcode)
 
     rd.assert_not_called()

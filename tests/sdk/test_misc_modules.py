@@ -6,7 +6,7 @@ without error and applies the expected filter mode.
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -71,8 +71,10 @@ def test_get_chains_returns_data(opt_rg) -> None:
 
 def test_get_option_market_data_by_id_returns_data(opt_rg) -> None:
     opt_rg.return_value = [{"delta": "0.5"}]
-    with patch("robin_stocks.robinhood.options.get_option_instrument_data_by_id",
-              return_value={"url": "https://api/options/instruments/opt-1/"}):
+    with patch(
+        "robin_stocks.robinhood.options.get_option_instrument_data_by_id",
+        return_value={"url": "https://api/options/instruments/opt-1/"},
+    ):
         out = options.get_option_market_data_by_id("opt-1")
     assert out is not None
 
@@ -90,18 +92,23 @@ def test_get_option_instrument_data_by_id_returns_data(opt_rg) -> None:
 
 
 def test_find_options_by_expiration_collects(opt_rg) -> None:
-    with patch("robin_stocks.robinhood.options.find_tradable_options",
-              return_value=[{"expiration_date": "2026-06-19", "strike_price": "100", "id": "o1"}]), \
-         patch("robin_stocks.robinhood.options.get_option_market_data_by_id", return_value=[{"delta": "0.5"}]):
+    with (
+        patch(
+            "robin_stocks.robinhood.options.find_tradable_options",
+            return_value=[{"expiration_date": "2026-06-19", "strike_price": "100", "id": "o1"}],
+        ),
+        patch("robin_stocks.robinhood.options.get_option_market_data_by_id", return_value=[{"delta": "0.5"}]),
+    ):
         out = options.find_options_by_expiration("AAPL", "2026-06-19")
     assert isinstance(out, list)
     assert len(out) == 1
 
 
 def test_find_options_by_strike_collects(opt_rg) -> None:
-    with patch("robin_stocks.robinhood.options.find_tradable_options",
-              return_value=[{"strike_price": "100.0000", "id": "o1"}]), \
-         patch("robin_stocks.robinhood.options.get_option_market_data_by_id", return_value=[{}]):
+    with (
+        patch("robin_stocks.robinhood.options.find_tradable_options", return_value=[{"strike_price": "100.0000", "id": "o1"}]),
+        patch("robin_stocks.robinhood.options.get_option_market_data_by_id", return_value=[{}]),
+    ):
         out = options.find_options_by_strike("AAPL", 100)
     assert isinstance(out, list)
 
@@ -310,14 +317,24 @@ def test_create_absolute_csv_defaults_name_from_order_type() -> None:
 
 def test_export_completed_stock_orders_writes_csv(tmp_path) -> None:
     """Exercises the stock-order CSV export against mocked order + instrument data."""
-    orders_data = [{
-        "state": "filled", "side": "buy", "instrument": "https://api/i/1/",
-        "average_price": "100.00", "quantity": "1", "cancel": None,
-        "fees": "0.00", "last_transaction_at": "2026-01-01T00:00:00Z",
-        "type": "market", "executions": [],
-    }]
-    with patch("robin_stocks.robinhood.export.get_all_stock_orders", return_value=orders_data), \
-         patch("robin_stocks.robinhood.export.get_symbol_by_url", return_value="AAPL"):
+    orders_data = [
+        {
+            "state": "filled",
+            "side": "buy",
+            "instrument": "https://api/i/1/",
+            "average_price": "100.00",
+            "quantity": "1",
+            "cancel": None,
+            "fees": "0.00",
+            "last_transaction_at": "2026-01-01T00:00:00Z",
+            "type": "market",
+            "executions": [],
+        }
+    ]
+    with (
+        patch("robin_stocks.robinhood.export.get_all_stock_orders", return_value=orders_data),
+        patch("robin_stocks.robinhood.export.get_symbol_by_url", return_value="AAPL"),
+    ):
         # file_name=None → relative default name, lands inside dir_path
         export.export_completed_stock_orders(str(tmp_path), file_name=None)
     written = list(tmp_path.glob("*.csv"))
@@ -325,16 +342,23 @@ def test_export_completed_stock_orders_writes_csv(tmp_path) -> None:
 
 
 def test_export_completed_crypto_orders_writes_csv(tmp_path) -> None:
-    orders_data = [{
-        "state": "filled", "side": "buy", "cancel_url": None,
-        "currency_pair_id": "pair-1",
-        "average_price": "50000", "quantity": "0.1",
-        "fees": "0.00",
-        "last_transaction_at": "2026-01-01T00:00:00Z",
-        "type": "market",
-    }]
-    with patch("robin_stocks.robinhood.export.get_all_crypto_orders", return_value=orders_data), \
-         patch("robin_stocks.robinhood.export.get_crypto_quote_from_id", return_value="BTC"):
+    orders_data = [
+        {
+            "state": "filled",
+            "side": "buy",
+            "cancel_url": None,
+            "currency_pair_id": "pair-1",
+            "average_price": "50000",
+            "quantity": "0.1",
+            "fees": "0.00",
+            "last_transaction_at": "2026-01-01T00:00:00Z",
+            "type": "market",
+        }
+    ]
+    with (
+        patch("robin_stocks.robinhood.export.get_all_crypto_orders", return_value=orders_data),
+        patch("robin_stocks.robinhood.export.get_crypto_quote_from_id", return_value="BTC"),
+    ):
         export.export_completed_crypto_orders(str(tmp_path), file_name=None)
     written = list(tmp_path.glob("*.csv"))
     assert len(written) == 1

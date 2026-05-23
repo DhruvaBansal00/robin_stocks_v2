@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import asyncio
-import importlib
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 import pytest
 
@@ -16,26 +16,26 @@ from robin_stocks_mcp.config import Config
 def _import_all_tool_modules() -> None:
     """Force-import every tool module so the FastMCP instance is fully populated."""
     from robin_stocks_mcp.tools import (  # noqa: F401
-        robinhood_auth,
-        robinhood_account,
-        robinhood_profiles,
-        robinhood_stocks,
-        robinhood_options,
-        robinhood_crypto,
-        robinhood_futures,
-        robinhood_markets,
-        robinhood_orders,
-        robinhood_recurring,
-        robinhood_export,
-        tda_auth,
-        tda_account,
-        tda_stocks,
-        tda_markets,
-        tda_orders,
-        gemini_auth,
         gemini_account,
+        gemini_auth,
         gemini_crypto,
         gemini_orders,
+        robinhood_account,
+        robinhood_auth,
+        robinhood_crypto,
+        robinhood_export,
+        robinhood_futures,
+        robinhood_markets,
+        robinhood_options,
+        robinhood_orders,
+        robinhood_profiles,
+        robinhood_recurring,
+        robinhood_stocks,
+        tda_account,
+        tda_auth,
+        tda_markets,
+        tda_orders,
+        tda_stocks,
     )
 
 

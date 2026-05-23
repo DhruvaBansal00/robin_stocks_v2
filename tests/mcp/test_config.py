@@ -22,17 +22,20 @@ def test_read_only_default_is_true(monkeypatch: pytest.MonkeyPatch) -> None:
     assert cfg.read_only is True
 
 
-@pytest.mark.parametrize("val,expected", [
-    ("true", True),
-    ("1", True),
-    ("yes", True),
-    ("y", True),
-    ("on", True),
-    ("no", False),
-    ("0", False),
-    ("false", False),
-    ("off", False),
-])
+@pytest.mark.parametrize(
+    "val,expected",
+    [
+        ("true", True),
+        ("1", True),
+        ("yes", True),
+        ("y", True),
+        ("on", True),
+        ("no", False),
+        ("0", False),
+        ("false", False),
+        ("off", False),
+    ],
+)
 def test_bool_env_parser(monkeypatch: pytest.MonkeyPatch, val: str, expected: bool) -> None:
     # Use a different env var to test the helper directly
     monkeypatch.setenv("ROBIN_STOCKS_MCP_AUTO_LOGIN", val)

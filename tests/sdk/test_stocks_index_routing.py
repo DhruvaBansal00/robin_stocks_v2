@@ -15,9 +15,11 @@ from robin_stocks.robinhood import stocks
 
 
 def test_get_stock_quote_by_symbol_regular_uses_stock_quote_path() -> None:
-    with patch("robin_stocks.robinhood.stocks.id_for_stock", return_value="inst-1"), \
-         patch("robin_stocks.robinhood.stocks.get_stock_quote_by_id", return_value={"last": "100"}) as sq, \
-         patch("robin_stocks.robinhood.stocks.get_index_quote_by_id") as iq:
+    with (
+        patch("robin_stocks.robinhood.stocks.id_for_stock", return_value="inst-1"),
+        patch("robin_stocks.robinhood.stocks.get_stock_quote_by_id", return_value={"last": "100"}) as sq,
+        patch("robin_stocks.robinhood.stocks.get_index_quote_by_id") as iq,
+    ):
         out = stocks.get_stock_quote_by_symbol("AAPL")
     sq.assert_called_once_with("inst-1")
     iq.assert_not_called()
@@ -26,9 +28,11 @@ def test_get_stock_quote_by_symbol_regular_uses_stock_quote_path() -> None:
 
 @pytest.mark.parametrize("symbol", ["SPX", "NDX", "VIX", "RUT", "XSP"])
 def test_get_stock_quote_by_symbol_index_uses_index_quote_path(symbol: str) -> None:
-    with patch("robin_stocks.robinhood.stocks.id_for_stock", return_value="idx-1"), \
-         patch("robin_stocks.robinhood.stocks.get_stock_quote_by_id") as sq, \
-         patch("robin_stocks.robinhood.stocks.get_index_quote_by_id", return_value={"last": "5000"}) as iq:
+    with (
+        patch("robin_stocks.robinhood.stocks.id_for_stock", return_value="idx-1"),
+        patch("robin_stocks.robinhood.stocks.get_stock_quote_by_id") as sq,
+        patch("robin_stocks.robinhood.stocks.get_index_quote_by_id", return_value={"last": "5000"}) as iq,
+    ):
         out = stocks.get_stock_quote_by_symbol(symbol)
     iq.assert_called_once_with("idx-1")
     sq.assert_not_called()

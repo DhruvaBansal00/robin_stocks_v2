@@ -1,7 +1,6 @@
 """Holds the session header and other global variables."""
+
 import sys
-import os
-import time
 import threading
 
 from requests import Session
@@ -17,17 +16,17 @@ SESSION.headers = {
     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
     "X-Robinhood-API-Version": "1.431.4",
     "Connection": "keep-alive",
-    "User-Agent": "*"
+    "User-Agent": "*",
 }
 
-#All print() statement direct their output to this stream
-#by default, we use stdout which is the existing behavior
-#but a client can change to any normal Python stream that
-#print() accepts.  Common options are
-#sys.stderr for standard error
-#open(os.devnull,"w") for dev null
-#io.StringIO() to go to a string for the client to inspect
-OUTPUT=sys.stdout
+# All print() statement direct their output to this stream
+# by default, we use stdout which is the existing behavior
+# but a client can change to any normal Python stream that
+# print() accepts.  Common options are
+# sys.stderr for standard error
+# open(os.devnull,"w") for dev null
+# io.StringIO() to go to a string for the client to inspect
+OUTPUT = sys.stdout
 
 # Rate limiting configuration
 RATE_LIMIT_ENABLED = False  # Disabled by default to maintain backward compatibility
