@@ -276,6 +276,13 @@ def test_get_card_transactions_with_card_type(rg) -> None:
     assert rg.call_args[0][1] == "pagination"
 
 
+def test_get_card_transactions_payload_uses_card_type(rg) -> None:
+    """Regression: payload must be built from the cardType arg, not the builtin `type`."""
+    rg.return_value = [{"id": "1"}]
+    account.get_card_transactions(cardType="settled")
+    assert rg.call_args[0][2] == {"type": "settled"}
+
+
 # ---------------------------------------------------------------------------
 # Payments
 # ---------------------------------------------------------------------------

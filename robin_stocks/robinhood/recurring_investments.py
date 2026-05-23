@@ -55,7 +55,7 @@ def create_recurring_investment(
     """
     if not account_number:
         account_data = load_account_profile(account_number=account_number)
-        account_number = account_data.get("account_number")
+        account_number = account_data.get("account_number") if account_data else None
 
     if not account_number:
         print("ERROR: Could not get account number", file=get_output())
@@ -150,7 +150,7 @@ def update_recurring_investment(
     """
     if not account_number:
         account_data = load_account_profile(account_number=account_number)
-        account_number = account_data.get("account_number")
+        account_number = account_data.get("account_number") if account_data else None
         if not account_number:
             print("ERROR: Could not get account number", file=get_output())
             return None

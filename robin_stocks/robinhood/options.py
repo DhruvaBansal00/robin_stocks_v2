@@ -351,7 +351,7 @@ def find_options_by_specific_profitability(
 
             market_data = get_option_market_data_by_id(option["id"])
 
-            if len(market_data):
+            if market_data:
                 option.update(market_data[0])
                 write_spinner()
 

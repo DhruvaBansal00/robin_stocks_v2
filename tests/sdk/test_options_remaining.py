@@ -81,6 +81,17 @@ def test_find_options_by_specific_profitability_invalid_typeprofit_defaults() ->
     assert isinstance(out, list)
 
 
+def test_find_options_by_specific_profitability_skips_none_market_data() -> None:
+    """Regression: get_option_market_data_by_id may return None; must not call len(None)."""
+    tradable = [{"expiration_date": "2026-06-19", "id": "o1"}]
+    with (
+        patch("robin_stocks.robinhood.options.find_tradable_options", return_value=tradable),
+        patch("robin_stocks.robinhood.options.get_option_market_data_by_id", return_value=None),
+    ):
+        out = options.find_options_by_specific_profitability("AAPL", expirationDate="2026-06-19")
+    assert out == []
+
+
 # ---------------------------------------------------------------------------
 # get_option_market_data / get_option_instrument_data
 # ---------------------------------------------------------------------------

@@ -17,8 +17,9 @@ def fix_file_extension(file_name):
 
     """
     path = Path(file_name)
-    path = path.with_suffix(".csv")
-    return path.resolve()
+    # Return a relative path (not .resolve()) so create_absolute_csv can join it
+    # under the caller's dir_path; resolving here would make the join ignore dir_path.
+    return path.with_suffix(".csv")
 
 
 def create_absolute_csv(dir_path, file_name, order_type):
