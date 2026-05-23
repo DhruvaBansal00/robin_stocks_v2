@@ -8,6 +8,8 @@ import inspect
 from collections.abc import Awaitable, Callable
 from typing import Any, TypeVar
 
+import requests
+
 from .config import Config, load_config
 
 T = TypeVar("T")
@@ -52,6 +54,36 @@ def format_error(exc: BaseException) -> dict[str, Any]:
     }
 
 
+def _coerce_response(value: Any) -> Any:
+    """Parse a raw ``requests.Response`` into JSON, falling back to status/text."""
+    if isinstance(value, requests.Response):
+        try:
+            return value.json()
+        except ValueError:
+            return {"status_code": value.status_code, "text": value.text}
+    return value
+
+
+def normalize_result(value: Any) -> Any:
+    """Make an SDK return value JSON-serializable for the MCP transport.
+
+    The Gemini and TDA SDK functions return a ``(data, error)`` tuple, and when their
+    parse-json default is off (it is, by default) ``data`` is a raw ``requests.Response`` —
+    which serializes to the useless string ``"<Response [200]>"``. Robinhood instead returns
+    parsed data directly. This normalizes every shape: it unpacks the ``(data, error)`` tuple,
+    surfaces an SDK error as a structured payload, and parses any raw Response into JSON.
+
+    A 2-tuple is only treated as ``(data, error)`` when its second element is ``None`` or an
+    exception, so genuine 2-element data (e.g. a Robinhood list) passes through untouched.
+    """
+    if isinstance(value, tuple) and len(value) == 2 and (value[1] is None or isinstance(value[1], BaseException)):
+        data, error = value
+        if error is not None:
+            return format_error(error)
+        return _coerce_response(data)
+    return _coerce_response(value)
+
+
 def safe_tool(write: bool = False) -> Callable[[Callable[..., Awaitable[Any]]], Callable[..., Awaitable[Any]]]:
     """Decorator: catch exceptions and (optionally) enforce read-only mode.
 
@@ -69,7 +101,7 @@ def safe_tool(write: bool = False) -> Callable[[Callable[..., Awaitable[Any]]], 
                 result = fn(*args, **kwargs)
                 if inspect.isawaitable(result):
                     result = await result
-                return result
+                return normalize_result(result)
             except ReadOnlyError as e:
                 return format_error(e)
             except Exception as e:  # noqa: BLE001 - tool surface boundary
