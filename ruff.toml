@@ -1,0 +1,22 @@
+# Ruff config for robin_stocks_v2.
+# 127-char lines match the project's historical flake8 convention.
+line-length = 127
+target-version = "py310"
+
+[lint]
+# E/W: pycodestyle, F: pyflakes, I: isort, UP: pyupgrade, B: flake8-bugbear
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = [
+    # robin_stocks re-exports its public API via `from .module import *`, so
+    # star imports and the names they pull in are intentional, not bugs.
+    "F403",
+    "F405",
+    # `ruff format` owns line width for code; the only lines it can't wrap are
+    # long URLs / string literals, so linting E501 on top of it just nags.
+    "E501",
+]
+
+[lint.per-file-ignores]
+# __init__.py files re-export the package's public API; the "unused" imports
+# are the API surface, not dead code.
+"__init__.py" = ["F401"]
