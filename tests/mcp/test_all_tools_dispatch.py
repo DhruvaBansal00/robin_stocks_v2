@@ -28,11 +28,26 @@ def _force_register_tools() -> None:
     """Import every tool module so the FastMCP registry is populated at
     collection time (the session autouse fixture runs too late for this)."""
     from robin_stocks_mcp.tools import (  # noqa: F401
-        robinhood_auth, robinhood_account, robinhood_profiles, robinhood_stocks,
-        robinhood_options, robinhood_crypto, robinhood_futures, robinhood_markets,
-        robinhood_orders, robinhood_recurring, robinhood_export,
-        tda_auth, tda_account, tda_stocks, tda_markets, tda_orders,
-        gemini_auth, gemini_account, gemini_crypto, gemini_orders,
+        gemini_account,
+        gemini_auth,
+        gemini_crypto,
+        gemini_orders,
+        robinhood_account,
+        robinhood_auth,
+        robinhood_crypto,
+        robinhood_export,
+        robinhood_futures,
+        robinhood_markets,
+        robinhood_options,
+        robinhood_orders,
+        robinhood_profiles,
+        robinhood_recurring,
+        robinhood_stocks,
+        tda_account,
+        tda_auth,
+        tda_markets,
+        tda_orders,
+        tda_stocks,
     )
 
 
@@ -44,9 +59,14 @@ PREFIX_TO_MODULE = {"rh_": rh, "tda_": tda, "gem_": gem}
 # don't want to invoke generically. They are covered by dedicated tests.
 SKIP_TOOLS = {
     # auth/login tools have bespoke argument handling + dedicated tests
-    "rh_login", "rh_logout", "tda_login", "tda_login_first_time", "gem_login",
+    "rh_login",
+    "rh_logout",
+    "tda_login",
+    "tda_login_first_time",
+    "gem_login",
     # download tools write to disk with bespoke return strings
-    "rh_download_document", "rh_download_all_documents",
+    "rh_download_document",
+    "rh_download_all_documents",
     # unpacks **filters (empty dict ⇒ no-arg call); covered by a dedicated test
     "rh_find_stock_orders",
 }
@@ -63,7 +83,7 @@ def _sdk_attr(name: str) -> str:
     """rh_get_quotes -> get_quotes; tda_get_quote -> get_quote."""
     for prefix in PREFIX_TO_MODULE:
         if name.startswith(prefix):
-            return name[len(prefix):]
+            return name[len(prefix) :]
     return name
 
 
@@ -141,7 +161,7 @@ async def test_tool_forwards_to_sdk(name, module, attr, fn, _writes_enabled) -> 
     module_path = module.__name__  # e.g. "robin_stocks.robinhood"
     with patch(f"{module_path}.{attr}", return_value={"ok": True}) as sdk_mock:
         kwargs = _build_kwargs(fn)
-        result = await fn(**kwargs)
+        await fn(**kwargs)
 
     # The SDK function must have been called. (Some tools post-process the
     # result into a string, so we don't assert on the return value.)

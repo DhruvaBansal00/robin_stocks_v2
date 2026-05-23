@@ -14,12 +14,11 @@ from __future__ import annotations
 
 import threading
 import time
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 from robin_stocks.robinhood import helper
-
 
 # ---------------------------------------------------------------------------
 # INDEX_OPT_SYMBOLS — the load-bearing constant for the #541 routing
@@ -142,26 +141,34 @@ def test_update_session_for_futures_sets_protected_header() -> None:
 
 
 def test_id_for_futures_contract_happy_path() -> None:
-    with patch(
-        "robin_stocks.robinhood.helper.request_get",
-        return_value={"result": {"id": "contract-1"}},
-    ), patch("robin_stocks.robinhood.helper.update_session_for_futures") as upd:
+    with (
+        patch(
+            "robin_stocks.robinhood.helper.request_get",
+            return_value={"result": {"id": "contract-1"}},
+        ),
+        patch("robin_stocks.robinhood.helper.update_session_for_futures") as upd,
+    ):
         out = helper.id_for_futures_contract("esh26")  # lowercase tolerated
         assert out == "contract-1"
         upd.assert_called_once()  # must inject the protected header
 
 
 def test_id_for_futures_contract_returns_none_when_no_result_key() -> None:
-    with patch(
-        "robin_stocks.robinhood.helper.request_get",
-        return_value={"detail": "not found"},
-    ), patch("robin_stocks.robinhood.helper.update_session_for_futures"):
+    with (
+        patch(
+            "robin_stocks.robinhood.helper.request_get",
+            return_value={"detail": "not found"},
+        ),
+        patch("robin_stocks.robinhood.helper.update_session_for_futures"),
+    ):
         assert helper.id_for_futures_contract("FAKE") is None
 
 
 def test_id_for_futures_contract_returns_none_when_request_returns_falsy() -> None:
-    with patch("robin_stocks.robinhood.helper.request_get", return_value=None), \
-         patch("robin_stocks.robinhood.helper.update_session_for_futures"):
+    with (
+        patch("robin_stocks.robinhood.helper.request_get", return_value=None),
+        patch("robin_stocks.robinhood.helper.update_session_for_futures"),
+    ):
         assert helper.id_for_futures_contract("FAKE") is None
 
 

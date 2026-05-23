@@ -15,7 +15,6 @@ import pytest
 
 from robin_stocks.robinhood import options
 
-
 # ---------------------------------------------------------------------------
 # _index_chain_symbol mapping
 # ---------------------------------------------------------------------------
@@ -28,8 +27,8 @@ from robin_stocks.robinhood import options
         ("SPX", "SPXW"),
         ("RUT", "RUTW"),
         ("VIX", "VIXW"),
-        ("XSP", "XSP"),       # XSP has no suffix
-        ("AAPL", "AAPL"),     # Non-index passes through
+        ("XSP", "XSP"),  # XSP has no suffix
+        ("AAPL", "AAPL"),  # Non-index passes through
         ("TSLA", "TSLA"),
         ("", ""),
     ],
@@ -97,9 +96,7 @@ def test_find_tradable_options_xsp_uses_xsp_verbatim(mocked_options_deps) -> Non
 
 
 def test_find_tradable_options_forwards_optional_filters(mocked_options_deps) -> None:
-    options.find_tradable_options(
-        "AAPL", expirationDate="2026-06-19", strikePrice="100", optionType="call"
-    )
+    options.find_tradable_options("AAPL", expirationDate="2026-06-19", strikePrice="100", optionType="call")
     payload = mocked_options_deps["request_get"].call_args[0][2]
     assert payload["expiration_dates"] == "2026-06-19"
     assert payload["strike_price"] == "100"
@@ -114,8 +111,10 @@ def test_find_tradable_options_invalid_symbol_returns_none() -> None:
 
 
 def test_find_tradable_options_unknown_chain_returns_none() -> None:
-    with patch("robin_stocks.robinhood.options.id_for_chain", return_value=None), \
-         patch("robin_stocks.robinhood.helper.LOGGED_IN", True):
+    with (
+        patch("robin_stocks.robinhood.options.id_for_chain", return_value=None),
+        patch("robin_stocks.robinhood.helper.LOGGED_IN", True),
+    ):
         out = options.find_tradable_options("ZZZZ")
     assert out == [None]
 

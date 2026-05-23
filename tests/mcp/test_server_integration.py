@@ -10,6 +10,7 @@ import json
 from unittest.mock import patch
 
 import pytest
+from mcp.server.fastmcp.exceptions import ToolError
 
 from robin_stocks_mcp.app import mcp
 
@@ -35,9 +36,7 @@ async def test_call_tool_via_fastmcp_with_mocked_sdk() -> None:
     (content_blocks, structured_payload) depending on version. Either way our SDK
     return value must appear somewhere in the serialized output.
     """
-    with patch(
-        "robin_stocks.robinhood.get_quotes", return_value=[{"symbol": "AAPL", "last": "1"}]
-    ):
+    with patch("robin_stocks.robinhood.get_quotes", return_value=[{"symbol": "AAPL", "last": "1"}]):
         result = await mcp.call_tool("rh_get_quotes", {"inputSymbols": "AAPL"})
 
     serialized = json.dumps(result, default=str)
@@ -47,7 +46,7 @@ async def test_call_tool_via_fastmcp_with_mocked_sdk() -> None:
 @pytest.mark.asyncio
 async def test_call_tool_unknown_name_errors() -> None:
     """Calling a nonexistent tool through FastMCP raises (the SDK handles it)."""
-    with pytest.raises(Exception):
+    with pytest.raises(ToolError):
         await mcp.call_tool("does_not_exist_xyz", {})
 
 
@@ -55,9 +54,7 @@ async def test_call_tool_unknown_name_errors() -> None:
 async def test_call_write_tool_blocked_read_only(writes_disabled) -> None:
     """Write tools return structured error payloads, not exceptions."""
     with patch("robin_stocks.robinhood.order_buy_market") as m:
-        result = await mcp.call_tool(
-            "rh_order_buy_market", {"symbol": "AAPL", "quantity": 1}
-        )
+        result = await mcp.call_tool("rh_order_buy_market", {"symbol": "AAPL", "quantity": 1})
         m.assert_not_called()
 
     # Confirm error markers appear in serialized result

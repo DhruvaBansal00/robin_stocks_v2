@@ -1,9 +1,10 @@
-''' An example on how to place an order and then cancel it.
-'''
+"""An example on how to place an order and then cancel it."""
+
 import os
 
-import robin_stocks.tda as tda
 from dotenv import load_dotenv
+
+import robin_stocks.tda as tda
 
 load_dotenv()
 
@@ -15,16 +16,7 @@ order = {
     "session": "NORMAL",
     "duration": "DAY",
     "orderStrategyType": "SINGLE",
-    "orderLegCollection": [
-        {
-            "instruction": "Buy",
-            "quantity": 1,
-            "instrument": {
-                "symbol": "AMC",
-                "assetType": "EQUITY"
-            }
-        }
-    ]
+    "orderLegCollection": [{"instruction": "Buy", "quantity": 1, "instrument": {"symbol": "AMC", "assetType": "EQUITY"}}],
 }
 data, err = tda.place_order(os.environ["tda_order_account"], order, True)
 order_id = tda.get_order_number(data)

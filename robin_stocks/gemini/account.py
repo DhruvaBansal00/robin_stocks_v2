@@ -1,6 +1,5 @@
 from robin_stocks.gemini.authentication import generate_signature
-from robin_stocks.gemini.helper import (format_inputs, login_required,
-                                        request_post)
+from robin_stocks.gemini.helper import format_inputs, login_required, request_post
 from robin_stocks.gemini.urls import URLS
 
 
@@ -31,9 +30,7 @@ def get_account_detail(jsonify=None):
 
     """
     url = URLS.account_detail()
-    payload = {
-        "request": URLS.get_endpoint(url)
-    }
+    payload = {"request": URLS.get_endpoint(url)}
     generate_signature(payload)
     data, err = request_post(url, payload, jsonify)
     return data, err
@@ -59,9 +56,7 @@ def check_available_balances(jsonify=None):
 
     """
     url = URLS.available_balances()
-    payload = {
-        "request": URLS.get_endpoint(url)
-    }
+    payload = {"request": URLS.get_endpoint(url)}
     generate_signature(payload)
     data, err = request_post(url, payload, jsonify)
     return data, err
@@ -89,9 +84,7 @@ def check_notional_balances(jsonify=None):
 
     """
     url = URLS.notional_balances()
-    payload = {
-        "request": URLS.get_endpoint(url)
-    }
+    payload = {"request": URLS.get_endpoint(url)}
     generate_signature(payload)
     data, err = request_post(url, payload, jsonify)
     return data, err
@@ -129,10 +122,7 @@ def check_transfers(timestamp=None, limit_transfers=10, show_completed_deposit_a
                       * purpose - Optional. Administrative field used to supply a reason for certain types of advances.
     """
     url = URLS.transfers()
-    payload = {
-        "request": URLS.get_endpoint(url),
-        "show_completed_deposit_advances": show_completed_deposit_advances
-    }
+    payload = {"request": URLS.get_endpoint(url), "show_completed_deposit_advances": show_completed_deposit_advances}
     if timestamp:
         payload["timestamp"] = timestamp
     generate_signature(payload)
@@ -142,7 +132,7 @@ def check_transfers(timestamp=None, limit_transfers=10, show_completed_deposit_a
 
 @login_required
 @format_inputs
-def get_deposit_addresses(network, timestamp=None,  jsonify=None):
+def get_deposit_addresses(network, timestamp=None, jsonify=None):
     """ Gets a list of all deposit addresses.
 
     :param network: network can be bitcoin, ethereum, bitcoincash, litecoin, zcash, filecoin.
@@ -162,9 +152,7 @@ def get_deposit_addresses(network, timestamp=None,  jsonify=None):
 
     """
     url = URLS.deposit_addresses(network)
-    payload = {
-        "request": URLS.get_endpoint(url)
-    }
+    payload = {"request": URLS.get_endpoint(url)}
     if timestamp:
         payload["timestamp"] = timestamp
     generate_signature(payload)
@@ -196,9 +184,7 @@ def get_approved_addresses(network, jsonify=None):
 
     """
     url = URLS.approved_addresses(network)
-    payload = {
-        "request": URLS.get_endpoint(url)
-    }
+    payload = {"request": URLS.get_endpoint(url)}
     generate_signature(payload)
     data, err = request_post(url, payload, jsonify)
     return data, err
@@ -213,7 +199,7 @@ def withdraw_crypto_funds(currency_code, address, amount, jsonify=None):
         2. The address you want to withdraw funds to needs to already be on that approved address list
         3. An API key with the Fund Manager role added
 
-    :param currency_code: the three-letter currency code of a supported crypto-currency, e.g. btc or eth. 
+    :param currency_code: the three-letter currency code of a supported crypto-currency, e.g. btc or eth.
     :type currency_code: str
     :param address: Standard string format of cryptocurrency address.
     :type address: str
@@ -234,11 +220,7 @@ def withdraw_crypto_funds(currency_code, address, amount, jsonify=None):
 
     """
     url = URLS.withdrawl_crypto(currency_code)
-    payload = {
-        "request": URLS.get_endpoint(url),
-        "address": address,
-        "amount": amount
-    }
+    payload = {"request": URLS.get_endpoint(url), "address": address, "amount": amount}
     generate_signature(payload)
     data, err = request_post(url, payload, jsonify)
     return data, err

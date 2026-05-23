@@ -14,8 +14,10 @@ from robin_stocks.robinhood import crypto
 def test_get_open_crypto_positions_sends_nonzero_flag() -> None:
     """PR #333: the open-positions endpoint differs from the full list only
     by the nonzero=true payload."""
-    with patch("robin_stocks.robinhood.crypto.request_get", return_value=[{"currency": "BTC"}]) as rg, \
-         patch("robin_stocks.robinhood.helper.LOGGED_IN", True):
+    with (
+        patch("robin_stocks.robinhood.crypto.request_get", return_value=[{"currency": "BTC"}]) as rg,
+        patch("robin_stocks.robinhood.helper.LOGGED_IN", True),
+    ):
         out = crypto.get_open_crypto_positions()
 
     # URL must be the crypto holdings endpoint
@@ -28,16 +30,20 @@ def test_get_open_crypto_positions_sends_nonzero_flag() -> None:
 
 def test_get_open_crypto_positions_filters_by_info() -> None:
     payload = [{"currency": "BTC", "quantity": "1"}, {"currency": "ETH", "quantity": "2"}]
-    with patch("robin_stocks.robinhood.crypto.request_get", return_value=payload), \
-         patch("robin_stocks.robinhood.helper.LOGGED_IN", True):
+    with (
+        patch("robin_stocks.robinhood.crypto.request_get", return_value=payload),
+        patch("robin_stocks.robinhood.helper.LOGGED_IN", True),
+    ):
         out = crypto.get_open_crypto_positions(info="currency")
     assert out == ["BTC", "ETH"]
 
 
 def test_get_crypto_positions_does_not_filter_by_nonzero() -> None:
     """The full-list endpoint must NOT pass nonzero (regression for #333)."""
-    with patch("robin_stocks.robinhood.crypto.request_get", return_value=[]) as rg, \
-         patch("robin_stocks.robinhood.helper.LOGGED_IN", True):
+    with (
+        patch("robin_stocks.robinhood.crypto.request_get", return_value=[]) as rg,
+        patch("robin_stocks.robinhood.helper.LOGGED_IN", True),
+    ):
         crypto.get_crypto_positions()
 
     # Confirm get_crypto_positions calls without the nonzero payload

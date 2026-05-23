@@ -1,5 +1,5 @@
-''' The most basic way to interact with the public api.
-'''
+"""The most basic way to interact with the public api."""
+
 import robin_stocks.gemini as g
 
 response, error = g.get_pubticker("cheese")

@@ -7,7 +7,7 @@ underlying machinery.
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -130,8 +130,10 @@ def test_cancel_crypto_order_calls_request_post() -> None:
 def test_cancel_all_stock_orders_cancels_entries_with_cancel_url() -> None:
     """cancel_all_stock_orders posts to each non-null `cancel` link."""
     raw = [{"id": "a", "cancel": "url-a"}, {"id": "b", "cancel": None}, {"id": "c", "cancel": "url-c"}]
-    with patch("robin_stocks.robinhood.orders.request_get", return_value=raw), \
-         patch("robin_stocks.robinhood.orders.request_post") as rp:
+    with (
+        patch("robin_stocks.robinhood.orders.request_get", return_value=raw),
+        patch("robin_stocks.robinhood.orders.request_post") as rp,
+    ):
         out = orders.cancel_all_stock_orders()
     assert rp.call_count == 2
     assert len(out) == 2  # only the cancellable entries
@@ -140,16 +142,20 @@ def test_cancel_all_stock_orders_cancels_entries_with_cancel_url() -> None:
 def test_cancel_all_option_orders_uses_cancel_url_key() -> None:
     """Options use `cancel_url`, not `cancel`."""
     raw = [{"id": "1", "cancel_url": "url-1"}, {"id": "2", "cancel_url": None}]
-    with patch("robin_stocks.robinhood.orders.request_get", return_value=raw), \
-         patch("robin_stocks.robinhood.orders.request_post") as rp:
+    with (
+        patch("robin_stocks.robinhood.orders.request_get", return_value=raw),
+        patch("robin_stocks.robinhood.orders.request_post") as rp,
+    ):
         orders.cancel_all_option_orders()
     rp.assert_called_once_with("url-1")
 
 
 def test_cancel_all_crypto_orders_uses_cancel_url_key() -> None:
     raw = [{"id": "1", "cancel_url": "url-1"}]
-    with patch("robin_stocks.robinhood.orders.request_get", return_value=raw), \
-         patch("robin_stocks.robinhood.orders.request_post") as rp:
+    with (
+        patch("robin_stocks.robinhood.orders.request_get", return_value=raw),
+        patch("robin_stocks.robinhood.orders.request_post") as rp,
+    ):
         orders.cancel_all_crypto_orders()
     rp.assert_called_once_with("url-1")
 

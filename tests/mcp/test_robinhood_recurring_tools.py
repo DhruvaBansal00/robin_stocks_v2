@@ -54,7 +54,8 @@ async def test_rh_create_recurring_investment_dispatches_when_writes_enabled(wri
     with patch("robin_stocks.robinhood.create_recurring_investment", return_value={"id": "sched-1"}) as m:
         out = await get_fn("rh_create_recurring_investment")(symbol="AAPL", amount=5.0)
         m.assert_called_once_with(
-            "AAPL", 5.0,
+            "AAPL",
+            5.0,
             frequency="weekly",
             start_date=None,
             account_number=None,

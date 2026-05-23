@@ -28,9 +28,7 @@ async def tda_login_first_time(
 
     Run once after going through the TDA developer-portal OAuth flow.
     """
-    await to_thread(
-        tda.login_first_time, encryption_passcode, client_id, authorization_token, refresh_token
-    )
+    await to_thread(tda.login_first_time, encryption_passcode, client_id, authorization_token, refresh_token)
     return "ok: TDA credentials saved"
 
 

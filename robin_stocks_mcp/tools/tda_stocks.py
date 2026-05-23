@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, List, Optional, Union
+from typing import Any
 
 import robin_stocks.tda as tda
 
@@ -12,14 +12,14 @@ from ..runtime import safe_tool, to_thread
 
 @mcp.tool()
 @safe_tool()
-async def tda_get_quote(ticker: str, jsonify: Optional[bool] = None) -> Any:
+async def tda_get_quote(ticker: str, jsonify: bool | None = None) -> Any:
     """Quote info for a single stock via TDA."""
     return await to_thread(tda.get_quote, ticker, jsonify=jsonify)
 
 
 @mcp.tool()
 @safe_tool()
-async def tda_get_quotes(tickers: Union[str, List[str]], jsonify: Optional[bool] = None) -> Any:
+async def tda_get_quotes(tickers: str | list[str], jsonify: bool | None = None) -> Any:
     """Quote info for multiple stocks via TDA."""
     return await to_thread(tda.get_quotes, tickers, jsonify=jsonify)
 
@@ -31,11 +31,11 @@ async def tda_get_price_history(
     period_type: str,
     frequency_type: str,
     frequency: str,
-    period: Optional[str] = None,
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
+    period: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
     needExtendedHoursData: bool = True,
-    jsonify: Optional[bool] = None,
+    jsonify: bool | None = None,
 ) -> Any:
     """Price history for a stock.
 
@@ -58,16 +58,14 @@ async def tda_get_price_history(
 
 @mcp.tool()
 @safe_tool()
-async def tda_search_instruments(
-    ticker_string: str, projection: str, jsonify: Optional[bool] = None
-) -> Any:
+async def tda_search_instruments(ticker_string: str, projection: str, jsonify: bool | None = None) -> Any:
     """Search instruments matching a ticker string. projection: symbol-search / symbol-regex / desc-search / desc-regex / fundamental."""
     return await to_thread(tda.search_instruments, ticker_string, projection, jsonify=jsonify)
 
 
 @mcp.tool()
 @safe_tool()
-async def tda_get_instrument(cusip: str, jsonify: Optional[bool] = None) -> Any:
+async def tda_get_instrument(cusip: str, jsonify: bool | None = None) -> Any:
     """Get instrument data by CUSIP."""
     return await to_thread(tda.get_instrument, cusip, jsonify=jsonify)
 
@@ -80,18 +78,18 @@ async def tda_get_option_chains(
     strike_count: str = "10",
     include_quotes: str = "FALSE",
     strategy: str = "SINGLE",
-    interval: Optional[str] = None,
-    strike_price: Optional[str] = None,
+    interval: str | None = None,
+    strike_price: str | None = None,
     range_value: str = "ALL",
-    from_date: Optional[str] = None,
-    to_date: Optional[str] = None,
-    volatility: Optional[str] = None,
-    underlying_price: Optional[str] = None,
-    interest_rate: Optional[str] = None,
-    days_to_expiration: Optional[str] = None,
+    from_date: str | None = None,
+    to_date: str | None = None,
+    volatility: str | None = None,
+    underlying_price: str | None = None,
+    interest_rate: str | None = None,
+    days_to_expiration: str | None = None,
     exp_month: str = "ALL",
     option_type: str = "ALL",
-    jsonify: Optional[bool] = None,
+    jsonify: bool | None = None,
 ) -> Any:
     """Option chain data for a stock via TDA."""
     return await to_thread(

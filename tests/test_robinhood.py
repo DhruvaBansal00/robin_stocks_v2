@@ -1,10 +1,13 @@
 # Used by git Actions
-import os
 import datetime
-import robin_stocks.robinhood as r
+import os
+
 import pyotp
 import pytest
 from dateutil.relativedelta import relativedelta
+
+import robin_stocks.robinhood as r
+
 
 def third_friday(year, month, day):
     """Return datetime.date for monthly option expiration given year and
@@ -34,279 +37,279 @@ def round_up_price(ticker, multiplier):
     num = price + (multiplier - 1)
     return num - (num % multiplier)
 
-class TestStocks:
 
+class TestStocks:
     # Set up variables for class
-    single_stock = 'AAPL'
-    event_stock = 'USO1'
-    fake_stock = 'thisisfake'
-    instrument = 'https://api.robinhood.com/instruments/450dfc6d-5510-4d40-abfb-f633b7d9be3e/'
-    fake_instrument = 'https://api.robinhood.com/instruments/aaaaaaaa-0000-0000-0000-aaaaaaaaaaaa/'
-    id = '450dfc6d-5510-4d40-abfb-f633b7d9be3e'
-    list_stocks = ['tsla', 'f', 'plug', 'meTA', 'SPY', 'botz', 'jnug']
-    fake_stocks = ['87627273', 'ffffffffff']
+    single_stock = "AAPL"
+    event_stock = "USO1"
+    fake_stock = "thisisfake"
+    instrument = "https://api.robinhood.com/instruments/450dfc6d-5510-4d40-abfb-f633b7d9be3e/"
+    fake_instrument = "https://api.robinhood.com/instruments/aaaaaaaa-0000-0000-0000-aaaaaaaaaaaa/"
+    id = "450dfc6d-5510-4d40-abfb-f633b7d9be3e"
+    list_stocks = ["tsla", "f", "plug", "meTA", "SPY", "botz", "jnug"]
+    fake_stocks = ["87627273", "ffffffffff"]
 
     @classmethod
     def setup_class(cls):
-        totp  = pyotp.TOTP(os.environ['robin_mfa']).now()
-        login = r.login(os.environ['robin_username'], os.environ['robin_password'], mfa_code=totp)
+        totp = pyotp.TOTP(os.environ["robin_mfa"]).now()
+        r.login(os.environ["robin_username"], os.environ["robin_password"], mfa_code=totp)
 
     @classmethod
     def teardown_class(cls):
         r.logout()
 
     def test_name_apple(self):
-        name = r.get_name_by_symbol('aapl')
+        name = r.get_name_by_symbol("aapl")
         assert name == "Apple"
 
     def test_quotes(self):
         quote = r.get_quotes(self.single_stock, info=None)
-        assert (len(quote) == 1)
+        assert len(quote) == 1
         quote = quote[0]
-        assert (quote['symbol'] == self.single_stock)
-        assert ('ask_price' in quote)
-        assert ('ask_size' in quote)
-        assert ('bid_price' in quote)
-        assert ('bid_size' in quote)
-        assert ('last_trade_price' in quote)
-        assert ('last_extended_hours_trade_price' in quote)
-        assert ('previous_close' in quote)
-        assert ('adjusted_previous_close' in quote)
-        assert ('previous_close_date' in quote)
-        assert ('symbol' in quote)
-        assert ('trading_halted' in quote)
-        assert ('has_traded' in quote)
-        assert ('last_trade_price_source' in quote)
-        assert ('updated_at' in quote)
-        assert ('instrument' in quote)
+        assert quote["symbol"] == self.single_stock
+        assert "ask_price" in quote
+        assert "ask_size" in quote
+        assert "bid_price" in quote
+        assert "bid_size" in quote
+        assert "last_trade_price" in quote
+        assert "last_extended_hours_trade_price" in quote
+        assert "previous_close" in quote
+        assert "adjusted_previous_close" in quote
+        assert "previous_close_date" in quote
+        assert "symbol" in quote
+        assert "trading_halted" in quote
+        assert "has_traded" in quote
+        assert "last_trade_price_source" in quote
+        assert "updated_at" in quote
+        assert "instrument" in quote
         #
         more_quotes = r.get_quotes(self.list_stocks, info=None)
-        assert (len(more_quotes) ==  len(self.list_stocks))
+        assert len(more_quotes) == len(self.list_stocks)
         #
         fake_quotes = r.get_quotes(self.fake_stocks, info=None)
-        assert (len(fake_quotes) == 1)
-        assert (fake_quotes[0] == None)
+        assert len(fake_quotes) == 1
+        assert fake_quotes[0] is None
 
     def test_fundamentals(self):
         quote = r.get_fundamentals(self.single_stock, info=None)
-        assert (len(quote) == 1)
-        assert (quote[0]['symbol'] == self.single_stock)
+        assert len(quote) == 1
+        assert quote[0]["symbol"] == self.single_stock
         quote = quote[0]
-        assert ('open' in quote)
-        assert ('high' in quote)
-        assert ('low' in quote)
-        assert ('volume' in quote)
-        assert ('average_volume_2_weeks' in quote)
-        assert ('average_volume' in quote)
-        assert ('high_52_weeks' in quote)
-        assert ('dividend_yield' in quote)
-        assert ('float' in quote)
-        assert ('low_52_weeks' in quote)
-        assert ('market_cap' in quote)
-        assert ('pb_ratio' in quote)
-        assert ('pe_ratio' in quote)
-        assert ('shares_outstanding' in quote)
-        assert ('description' in quote)
-        assert ('instrument' in quote)
-        assert ('ceo' in quote)
-        assert ('headquarters_city' in quote)
-        assert ('headquarters_state' in quote)
-        assert ('sector' in quote)
-        assert ('industry' in quote)
-        assert ('num_employees' in quote)
-        assert ('year_founded' in quote)
-        assert ('symbol' in quote)
+        assert "open" in quote
+        assert "high" in quote
+        assert "low" in quote
+        assert "volume" in quote
+        assert "average_volume_2_weeks" in quote
+        assert "average_volume" in quote
+        assert "high_52_weeks" in quote
+        assert "dividend_yield" in quote
+        assert "float" in quote
+        assert "low_52_weeks" in quote
+        assert "market_cap" in quote
+        assert "pb_ratio" in quote
+        assert "pe_ratio" in quote
+        assert "shares_outstanding" in quote
+        assert "description" in quote
+        assert "instrument" in quote
+        assert "ceo" in quote
+        assert "headquarters_city" in quote
+        assert "headquarters_state" in quote
+        assert "sector" in quote
+        assert "industry" in quote
+        assert "num_employees" in quote
+        assert "year_founded" in quote
+        assert "symbol" in quote
         #
         more_quotes = r.get_fundamentals(self.list_stocks, info=None)
-        assert (len(more_quotes) == len(self.list_stocks))
+        assert len(more_quotes) == len(self.list_stocks)
         #
         fake_quotes = r.get_fundamentals(self.fake_stocks, info=None)
-        assert (len(fake_quotes) == 1)
-        assert (fake_quotes[0] == None)
+        assert len(fake_quotes) == 1
+        assert fake_quotes[0] is None
 
     def test_instruments(self):
         quote = r.get_instruments_by_symbols(self.single_stock)
-        assert (len(quote) == 1)
-        assert (quote[0]['symbol'] == self.single_stock)
+        assert len(quote) == 1
+        assert quote[0]["symbol"] == self.single_stock
         quote = quote[0]
-        assert ('id' in quote)
-        assert ('url' in quote)
-        assert ('quote' in quote)
-        assert ('fundamentals' in quote)
-        assert ('splits' in quote)
-        assert ('state' in quote)
-        assert ('market' in quote)
-        assert ('simple_name' in quote)
-        assert ('name' in quote)
-        assert ('tradeable' in quote)
-        assert ('tradability' in quote)
-        assert ('symbol' in quote)
-        assert ('bloomberg_unique' in quote)
-        assert ('margin_initial_ratio' in quote)
-        assert ('maintenance_ratio' in quote)
-        assert ('country' in quote)
-        assert ('day_trade_ratio' in quote)
-        assert ('list_date' in quote)
-        assert ('min_tick_size' in quote)
-        assert ('type' in quote)
-        assert ('tradable_chain_id' in quote)
-        assert ('rhs_tradability' in quote)
-        assert ('fractional_tradability' in quote)
-        assert ('default_collar_fraction' in quote)
+        assert "id" in quote
+        assert "url" in quote
+        assert "quote" in quote
+        assert "fundamentals" in quote
+        assert "splits" in quote
+        assert "state" in quote
+        assert "market" in quote
+        assert "simple_name" in quote
+        assert "name" in quote
+        assert "tradeable" in quote
+        assert "tradability" in quote
+        assert "symbol" in quote
+        assert "bloomberg_unique" in quote
+        assert "margin_initial_ratio" in quote
+        assert "maintenance_ratio" in quote
+        assert "country" in quote
+        assert "day_trade_ratio" in quote
+        assert "list_date" in quote
+        assert "min_tick_size" in quote
+        assert "type" in quote
+        assert "tradable_chain_id" in quote
+        assert "rhs_tradability" in quote
+        assert "fractional_tradability" in quote
+        assert "default_collar_fraction" in quote
         #
         more_quotes = r.get_fundamentals(self.list_stocks, info=None)
-        assert (len(more_quotes) == len(self.list_stocks))
+        assert len(more_quotes) == len(self.list_stocks)
         #
         fake_quotes = r.get_fundamentals(self.fake_stocks, info=None)
-        assert (len(fake_quotes) == 1)
-        assert (fake_quotes[0] == None)
+        assert len(fake_quotes) == 1
+        assert fake_quotes[0] is None
 
     def test_instrument_id(self):
         quote = r.get_instrument_by_url(self.instrument)
-        assert (quote['symbol'] == self.single_stock)
-        assert ('id' in quote)
-        assert ('url' in quote)
-        assert ('quote' in quote)
-        assert ('fundamentals' in quote)
-        assert ('splits' in quote)
-        assert ('state' in quote)
-        assert ('market' in quote)
-        assert ('simple_name' in quote)
-        assert ('name' in quote)
-        assert ('tradeable' in quote)
-        assert ('tradability' in quote)
-        assert ('symbol' in quote)
-        assert ('bloomberg_unique' in quote)
-        assert ('margin_initial_ratio' in quote)
-        assert ('maintenance_ratio' in quote)
-        assert ('country' in quote)
-        assert ('day_trade_ratio' in quote)
-        assert ('list_date' in quote)
-        assert ('min_tick_size' in quote)
-        assert ('type' in quote)
-        assert ('tradable_chain_id' in quote)
-        assert ('rhs_tradability' in quote)
-        assert ('fractional_tradability' in quote)
-        assert ('default_collar_fraction' in quote)
+        assert quote["symbol"] == self.single_stock
+        assert "id" in quote
+        assert "url" in quote
+        assert "quote" in quote
+        assert "fundamentals" in quote
+        assert "splits" in quote
+        assert "state" in quote
+        assert "market" in quote
+        assert "simple_name" in quote
+        assert "name" in quote
+        assert "tradeable" in quote
+        assert "tradability" in quote
+        assert "symbol" in quote
+        assert "bloomberg_unique" in quote
+        assert "margin_initial_ratio" in quote
+        assert "maintenance_ratio" in quote
+        assert "country" in quote
+        assert "day_trade_ratio" in quote
+        assert "list_date" in quote
+        assert "min_tick_size" in quote
+        assert "type" in quote
+        assert "tradable_chain_id" in quote
+        assert "rhs_tradability" in quote
+        assert "fractional_tradability" in quote
+        assert "default_collar_fraction" in quote
 
     def test_latest_price(self):
         price = r.get_latest_price(self.single_stock)
-        assert (len(price) == 1)
+        assert len(price) == 1
         more_prices = r.get_latest_price(self.list_stocks)
-        assert (len(more_prices) == len(self.list_stocks))
+        assert len(more_prices) == len(self.list_stocks)
         fake_prices = r.get_latest_price(self.fake_stocks)
-        assert (len(fake_prices) == 1)
-        assert (fake_prices[0] == None)
+        assert len(fake_prices) == 1
+        assert fake_prices[0] is None
 
     def test_name_by_symbol(self):
         name = r.get_name_by_symbol(self.single_stock)
-        assert (name == 'Apple')
+        assert name == "Apple"
         fake_name = r.get_name_by_symbol(self.fake_stock)
-        assert (fake_name == '')
+        assert fake_name == ""
 
     def test_name_by_url(self):
         name = r.get_name_by_url(self.instrument)
-        assert (name == 'Apple')
+        assert name == "Apple"
         fake_name = r.get_name_by_url(self.fake_instrument)
-        assert (fake_name == '')
+        assert fake_name == ""
 
     def test_symbol_by_url(self):
         symbol = r.get_symbol_by_url(self.instrument)
-        assert (symbol == self.single_stock)
+        assert symbol == self.single_stock
         fake_symbol = r.get_symbol_by_url(self.fake_instrument)
-        assert (fake_symbol == '')
+        assert fake_symbol == ""
 
     def test_get_ratings(self):
         ratings = r.get_ratings(self.single_stock)
-        assert ('summary' in ratings)
-        assert ('ratings' in ratings)
-        assert ('instrument_id' in ratings)
-        assert ('ratings_published_at' in ratings)
+        assert "summary" in ratings
+        assert "ratings" in ratings
+        assert "instrument_id" in ratings
+        assert "ratings_published_at" in ratings
         fake_ratings = r.get_ratings(self.fake_stock)
-        assert (fake_ratings == '')
+        assert fake_ratings == ""
 
     def test_events(self):
         event = r.get_events(self.single_stock)
-        assert (len(event) == 0)
+        assert len(event) == 0
         event = r.get_events(self.event_stock)
-        assert (len(event) != 0)
+        assert len(event) != 0
         event = event[0]
-        assert ('account' in event)
-        assert ('cash_component' in event)
-        assert ('chain_id' in event)
-        assert ('created_at' in event)
-        assert ('direction' in event)
-        assert ('equity_components' in event)
-        assert ('event_date' in event)
-        assert ('id' in event)
-        assert ('option' in event)
-        assert ('position' in event)
-        assert ('quantity' in event)
-        assert ('state' in event)
-        assert ('total_cash_amount' in event)
-        assert ('type' in event)
-        assert ('underlying_price' in event)
-        assert ('updated_at' in event)
+        assert "account" in event
+        assert "cash_component" in event
+        assert "chain_id" in event
+        assert "created_at" in event
+        assert "direction" in event
+        assert "equity_components" in event
+        assert "event_date" in event
+        assert "id" in event
+        assert "option" in event
+        assert "position" in event
+        assert "quantity" in event
+        assert "state" in event
+        assert "total_cash_amount" in event
+        assert "type" in event
+        assert "underlying_price" in event
+        assert "updated_at" in event
 
     def test_earning(self):
         earnings = r.get_earnings(self.single_stock)[0]
-        assert (earnings['symbol'] == self.single_stock)
-        assert ('symbol' in earnings)
-        assert ('instrument' in earnings)
-        assert ('year' in earnings)
-        assert ('quarter' in earnings)
-        assert ('eps' in earnings)
-        assert ('report' in earnings)
-        assert ('call' in earnings)
+        assert earnings["symbol"] == self.single_stock
+        assert "symbol" in earnings
+        assert "instrument" in earnings
+        assert "year" in earnings
+        assert "quarter" in earnings
+        assert "eps" in earnings
+        assert "report" in earnings
+        assert "call" in earnings
         fake_earnings = r.get_earnings(self.fake_stock)
-        assert (len(fake_earnings) == 0)
+        assert len(fake_earnings) == 0
 
     def test_news(self):
         news = r.get_news(self.single_stock)[0]
-        assert ('author' in news)
-        assert ('num_clicks' in news)
-        assert ('preview_image_url' in news)
-        assert ('published_at' in news)
-        assert ('relay_url' in news)
-        assert ('source' in news)
-        assert ('summary' in news)
-        assert ('title' in news)
-        assert ('updated_at' in news)
-        assert ('url' in news)
-        assert ('uuid' in news)
-        assert ('related_instruments' in news)
-        assert ('preview_text' in news)
-        assert ('currency_id' in news)
+        assert "author" in news
+        assert "num_clicks" in news
+        assert "preview_image_url" in news
+        assert "published_at" in news
+        assert "relay_url" in news
+        assert "source" in news
+        assert "summary" in news
+        assert "title" in news
+        assert "updated_at" in news
+        assert "url" in news
+        assert "uuid" in news
+        assert "related_instruments" in news
+        assert "preview_text" in news
+        assert "currency_id" in news
         fake_news = r.get_news(self.fake_stock)
-        assert (len(fake_news) == 0)
+        assert len(fake_news) == 0
 
     def test_split(self):
         split = r.get_splits(self.single_stock)[0]
-        assert (split['instrument'] == self.instrument)
+        assert split["instrument"] == self.instrument
         fake_split = r.get_splits(self.fake_stock)
-        assert (len(fake_split) == 0)
+        assert len(fake_split) == 0
 
     def test_stock_historicals(self):
-        historicals = r.get_stock_historicals(self.single_stock, interval='hour', span='day', bounds='regular', info=None)
-        assert (len(historicals) <= 6) # 6 regular hours in a day
-        historicals = r.get_stock_historicals(self.single_stock, interval='hour', span='day', bounds='trading', info=None)
-        assert (len(historicals) <= 9) # 9 trading hours total in a day
-        historicals = r.get_stock_historicals(self.single_stock, interval='hour', span='day', bounds='extended', info=None)
-        assert (len(historicals) <= 16) # 16 extended hours total in a day
+        historicals = r.get_stock_historicals(self.single_stock, interval="hour", span="day", bounds="regular", info=None)
+        assert len(historicals) <= 6  # 6 regular hours in a day
+        historicals = r.get_stock_historicals(self.single_stock, interval="hour", span="day", bounds="trading", info=None)
+        assert len(historicals) <= 9  # 9 trading hours total in a day
+        historicals = r.get_stock_historicals(self.single_stock, interval="hour", span="day", bounds="extended", info=None)
+        assert len(historicals) <= 16  # 16 extended hours total in a day
+
 
 class TestCrypto:
-
-    stock = 'AAPL'
-    bitcoin = 'BTC'
-    bitcoin_currency = 'BTC-USD'
-    bitcoin_symbol = 'BTCUSD'
-    fake = 'thisisafake'
-    account = os.environ['crypto_account']
+    stock = "AAPL"
+    bitcoin = "BTC"
+    bitcoin_currency = "BTC-USD"
+    bitcoin_symbol = "BTCUSD"
+    fake = "thisisafake"
+    account = os.environ["crypto_account"]
 
     @classmethod
     def setup_class(cls):
-        totp  = pyotp.TOTP(os.environ['robin_mfa']).now()
-        login = r.login(os.environ['robin_username'], os.environ['robin_password'], mfa_code=totp)
+        totp = pyotp.TOTP(os.environ["robin_mfa"]).now()
+        r.login(os.environ["robin_username"], os.environ["robin_password"], mfa_code=totp)
 
     @classmethod
     def teardown_class(cls):
@@ -315,105 +318,105 @@ class TestCrypto:
     def test_crypto_positions(self):
         positions = r.get_crypto_positions(info=None)
         first = positions[0]
-        assert (first['account_id'] == self.account)
-        assert ('account_id' in first)
-        assert ('cost_bases' in first)
-        assert ('created_at' in first)
-        assert ('currency' in first)
-        assert ('id' in first)
-        assert ('quantity' in first)
-        assert ('quantity_available' in first)
-        assert ('quantity_held_for_buy' in first)
-        assert ('quantity_held_for_sell' in first)
-        assert ('updated_at' in first)
+        assert first["account_id"] == self.account
+        assert "account_id" in first
+        assert "cost_bases" in first
+        assert "created_at" in first
+        assert "currency" in first
+        assert "id" in first
+        assert "quantity" in first
+        assert "quantity_available" in first
+        assert "quantity_held_for_buy" in first
+        assert "quantity_held_for_sell" in first
+        assert "updated_at" in first
 
     def test_get_crypto_currency_pairs(self):
         pairs = r.get_crypto_currency_pairs(info=None)
-        btc = [x for x in pairs if x['symbol'] == self.bitcoin_currency][0]
-        assert ('asset_currency' in btc)
-        assert ('display_only' in btc)
-        assert ('id' in btc)
-        assert ('max_order_size' in btc)
-        assert ('min_order_size' in btc)
-        assert ('min_order_price_increment' in btc)
-        assert ('min_order_quantity_increment' in btc)
-        assert ('name' in btc)
-        assert ('quote_currency' in btc)
-        assert ('symbol' in btc)
-        assert ('tradability' in btc)
-        fake = [x for x in pairs if x['symbol'] == self.fake]
-        assert (len(fake) == 0)
+        btc = [x for x in pairs if x["symbol"] == self.bitcoin_currency][0]
+        assert "asset_currency" in btc
+        assert "display_only" in btc
+        assert "id" in btc
+        assert "max_order_size" in btc
+        assert "min_order_size" in btc
+        assert "min_order_price_increment" in btc
+        assert "min_order_quantity_increment" in btc
+        assert "name" in btc
+        assert "quote_currency" in btc
+        assert "symbol" in btc
+        assert "tradability" in btc
+        fake = [x for x in pairs if x["symbol"] == self.fake]
+        assert len(fake) == 0
 
     def test_crypto_info(self):
         crypto = r.get_crypto_info(self.bitcoin, info=None)
-        assert ('asset_currency' in crypto)
-        assert ('display_only' in crypto)
-        assert ('id' in crypto)
-        assert ('max_order_size' in crypto)
-        assert ('min_order_size' in crypto)
-        assert ('min_order_price_increment' in crypto)
-        assert ('min_order_quantity_increment' in crypto)
-        assert ('name' in crypto)
-        assert ('quote_currency' in crypto)
-        assert ('symbol' in crypto)
-        assert ('tradability' in crypto)
+        assert "asset_currency" in crypto
+        assert "display_only" in crypto
+        assert "id" in crypto
+        assert "max_order_size" in crypto
+        assert "min_order_size" in crypto
+        assert "min_order_price_increment" in crypto
+        assert "min_order_quantity_increment" in crypto
+        assert "name" in crypto
+        assert "quote_currency" in crypto
+        assert "symbol" in crypto
+        assert "tradability" in crypto
         crypto = r.get_crypto_info(self.stock, info=None)
-        assert (crypto == None)
+        assert crypto is None
 
     def test_crypto_quote(self):
         crypto = r.get_crypto_quote(self.bitcoin, info=None)
-        assert ('ask_price' in crypto)
-        assert ('bid_price' in crypto)
-        assert ('mark_price' in crypto)
-        assert ('high_price' in crypto)
-        assert ('low_price' in crypto)
-        assert ('open_price' in crypto)
-        assert ('symbol' in crypto)
-        assert ('id' in crypto)
-        assert ('volume' in crypto)
+        assert "ask_price" in crypto
+        assert "bid_price" in crypto
+        assert "mark_price" in crypto
+        assert "high_price" in crypto
+        assert "low_price" in crypto
+        assert "open_price" in crypto
+        assert "symbol" in crypto
+        assert "id" in crypto
+        assert "volume" in crypto
         crypto = r.get_crypto_quote(self.stock, info=None)
-        assert (crypto == None)
+        assert crypto is None
         crypto = r.get_crypto_quote(self.fake, info=None)
-        assert (crypto == None)
+        assert crypto is None
 
     def test_crypto_historicals(self):
-        crypto = r.get_crypto_historicals(self.bitcoin, 'day', 'week', '24_7', info=None)
-        assert (len(crypto) == 7)
+        crypto = r.get_crypto_historicals(self.bitcoin, "day", "week", "24_7", info=None)
+        assert len(crypto) == 7
         first_point = crypto[0]
         # check keys
-        assert ('begins_at' in first_point)
-        assert ('open_price' in first_point)
-        assert ('close_price' in first_point)
-        assert ('high_price' in first_point)
-        assert ('low_price' in first_point)
-        assert ('volume' in first_point)
-        assert ('session' in first_point)
-        assert ('interpolated' in first_point)
+        assert "begins_at" in first_point
+        assert "open_price" in first_point
+        assert "close_price" in first_point
+        assert "high_price" in first_point
+        assert "low_price" in first_point
+        assert "volume" in first_point
+        assert "session" in first_point
+        assert "interpolated" in first_point
         #
-        crypto = r.get_crypto_historicals(self.bitcoin, 'hour', 'day', 'regular', info=None)
-        assert (len(crypto) <= 6) # 6 regular hours in a day
-        crypto = r.get_crypto_historicals(self.bitcoin, 'hour', 'day', 'trading', info=None)
-        assert (len(crypto) <= 9) # 9 trading hours in a day
-        crypto = r.get_crypto_historicals(self.bitcoin, 'hour', 'day', 'extended', info=None)
-        assert (len(crypto) <= 16) # 16 extended hours in a day
-        crypto = r.get_crypto_historicals(self.bitcoin, 'hour', 'day', '24_7', info=None)
-        assert (len(crypto) <= 24) # 24 24_7 hours in a day
+        crypto = r.get_crypto_historicals(self.bitcoin, "hour", "day", "regular", info=None)
+        assert len(crypto) <= 6  # 6 regular hours in a day
+        crypto = r.get_crypto_historicals(self.bitcoin, "hour", "day", "trading", info=None)
+        assert len(crypto) <= 9  # 9 trading hours in a day
+        crypto = r.get_crypto_historicals(self.bitcoin, "hour", "day", "extended", info=None)
+        assert len(crypto) <= 16  # 16 extended hours in a day
+        crypto = r.get_crypto_historicals(self.bitcoin, "hour", "day", "24_7", info=None)
+        assert len(crypto) <= 24  # 24 24_7 hours in a day
+
 
 class TestOptions:
-
     # have to login to use round_up_price
-    totp  = pyotp.TOTP(os.environ['robin_mfa']).now()
-    login = r.login(os.environ['robin_username'], os.environ['robin_password'], mfa_code=totp)
+    totp = pyotp.TOTP(os.environ["robin_mfa"]).now()
+    login = r.login(os.environ["robin_username"], os.environ["robin_password"], mfa_code=totp)
     #
     now = datetime.datetime.now() + relativedelta(months=1)
     expiration_date = third_friday(now.year, now.month, now.day).strftime("%Y-%m-%d")
-    symbol = 'AAPL'
+    symbol = "AAPL"
     strike = round_up_price(symbol, 10)
 
     @classmethod
     def setup_class(cls):
-        totp  = pyotp.TOTP(os.environ['robin_mfa']).now()
-        login = r.login(os.environ['robin_username'], os.environ['robin_password'], mfa_code=totp)
+        totp = pyotp.TOTP(os.environ["robin_mfa"]).now()
+        r.login(os.environ["robin_username"], os.environ["robin_password"], mfa_code=totp)
 
     @classmethod
     def teardown_class(cls):
@@ -422,47 +425,47 @@ class TestOptions:
     def test_find_tradable_options(self):
         info = r.find_options_by_expiration(self.symbol, self.expiration_date)
         first = info[0]
-        assert (first['expiration_date'] == self.expiration_date)
-        assert (len(info) > 50)
-        info = r.find_options_by_expiration(self.symbol, self.expiration_date, info='strike_price')
+        assert first["expiration_date"] == self.expiration_date
+        assert len(info) > 50
+        info = r.find_options_by_expiration(self.symbol, self.expiration_date, info="strike_price")
         first = info[0]
-        assert (type(first) == str)
-        assert (len(info) > 50)
-        info = r.find_options_by_expiration(self.symbol, self.expiration_date, info='expiration_date')
-        assert (len(set(info)) == 1)
+        assert isinstance(first, str)
+        assert len(info) > 50
+        info = r.find_options_by_expiration(self.symbol, self.expiration_date, info="expiration_date")
+        assert len(set(info)) == 1
 
     def test_find_options_by_strike(self):
         info = r.find_options_by_strike(self.symbol, self.strike)
-        assert (len(info) >= 24)
-        info = r.find_options_by_strike(self.symbol, self.strike,'call')
-        assert (info[0]['type'] == 'call')
-        info = r.find_options_by_strike(self.symbol, self.strike, info='expiration_date')
-        assert (len(set(info)) > 1)
-        info = r.find_options_by_strike(self.symbol, self.strike, info='strike_price')
-        assert (len(set(info)) == 1)
+        assert len(info) >= 24
+        info = r.find_options_by_strike(self.symbol, self.strike, "call")
+        assert info[0]["type"] == "call"
+        info = r.find_options_by_strike(self.symbol, self.strike, info="expiration_date")
+        assert len(set(info)) > 1
+        info = r.find_options_by_strike(self.symbol, self.strike, info="strike_price")
+        assert len(set(info)) == 1
 
     def test_find_options_by_expiration_and_strike(self):
         info = r.find_options_by_expiration_and_strike(self.symbol, self.expiration_date, self.strike)
-        assert (len(info) == 2)
-        assert (info[0]['expiration_date'] == self.expiration_date)
-        assert (float(info[0]['strike_price']) == self.strike)
-        info = r.find_options_by_expiration_and_strike(self.symbol, self.expiration_date, self.strike, 'call')
-        assert (len(info) == 1)
-        assert (info[0]['type'] == 'call')
+        assert len(info) == 2
+        assert info[0]["expiration_date"] == self.expiration_date
+        assert float(info[0]["strike_price"]) == self.strike
+        info = r.find_options_by_expiration_and_strike(self.symbol, self.expiration_date, self.strike, "call")
+        assert len(info) == 1
+        assert info[0]["type"] == "call"
+
 
 class TestMarkets:
-
-    today = datetime.datetime.today().strftime('%Y-%m-%d')
-    american_time = datetime.datetime.today().strftime('%m-%d-%Y')
-    nyse = 'XNYS'
-    amex = 'XASE'
-    nasdaq = 'XNAS'
-    fake = 'blah'
+    today = datetime.datetime.today().strftime("%Y-%m-%d")
+    american_time = datetime.datetime.today().strftime("%m-%d-%Y")
+    nyse = "XNYS"
+    amex = "XASE"
+    nasdaq = "XNAS"
+    fake = "blah"
 
     @classmethod
     def setup_class(cls):
-        totp  = pyotp.TOTP(os.environ['robin_mfa']).now()
-        login = r.login(os.environ['robin_username'], os.environ['robin_password'], mfa_code=totp)
+        totp = pyotp.TOTP(os.environ["robin_mfa"]).now()
+        r.login(os.environ["robin_username"], os.environ["robin_password"], mfa_code=totp)
 
     @classmethod
     def teardown_class(cls):
@@ -470,157 +473,157 @@ class TestMarkets:
 
     def test_top_movers(self):
         movers = r.get_top_movers()
-        assert (movers)
+        assert movers
         first = movers[0]
-        assert ('ask_price' in first)
-        assert ('ask_size' in first)
-        assert ('bid_price' in first)
-        assert ('bid_size' in first)
-        assert ('last_trade_price' in first)
-        assert ('last_extended_hours_trade_price' in first)
-        assert ('previous_close' in first)
-        assert ('adjusted_previous_close' in first)
-        assert ('previous_close_date' in first)
-        assert ('symbol' in first)
-        assert ('trading_halted' in first)
-        assert ('has_traded' in first)
-        assert ('last_trade_price_source' in first)
-        assert ('updated_at' in first)
-        assert ('instrument' in first)
+        assert "ask_price" in first
+        assert "ask_size" in first
+        assert "bid_price" in first
+        assert "bid_size" in first
+        assert "last_trade_price" in first
+        assert "last_extended_hours_trade_price" in first
+        assert "previous_close" in first
+        assert "adjusted_previous_close" in first
+        assert "previous_close_date" in first
+        assert "symbol" in first
+        assert "trading_halted" in first
+        assert "has_traded" in first
+        assert "last_trade_price_source" in first
+        assert "updated_at" in first
+        assert "instrument" in first
 
     def test_top_100(self):
         movers = r.get_top_100()
-        assert (movers)
+        assert movers
         first = movers[0]
-        assert ('ask_price' in first)
-        assert ('ask_size' in first)
-        assert ('bid_price' in first)
-        assert ('bid_size' in first)
-        assert ('last_trade_price' in first)
-        assert ('last_extended_hours_trade_price' in first)
-        assert ('previous_close' in first)
-        assert ('adjusted_previous_close' in first)
-        assert ('previous_close_date' in first)
-        assert ('symbol' in first)
-        assert ('trading_halted' in first)
-        assert ('has_traded' in first)
-        assert ('last_trade_price_source' in first)
-        assert ('updated_at' in first)
-        assert ('instrument' in first)
+        assert "ask_price" in first
+        assert "ask_size" in first
+        assert "bid_price" in first
+        assert "bid_size" in first
+        assert "last_trade_price" in first
+        assert "last_extended_hours_trade_price" in first
+        assert "previous_close" in first
+        assert "adjusted_previous_close" in first
+        assert "previous_close_date" in first
+        assert "symbol" in first
+        assert "trading_halted" in first
+        assert "has_traded" in first
+        assert "last_trade_price_source" in first
+        assert "updated_at" in first
+        assert "instrument" in first
 
     def test_top_movers_sp500(self):
         # going up
-        movers = r.get_top_movers_sp500('up')
-        assert (movers)
+        movers = r.get_top_movers_sp500("up")
+        assert movers
         first = movers[0]
-        assert ('instrument_url' in first)
-        assert ('symbol' in first)
-        assert ('updated_at' in first)
-        assert ('price_movement' in first)
-        assert ('description' in first)
-        assert ('market_hours_last_movement_pct' in first['price_movement'])
-        assert ('market_hours_last_price' in first['price_movement'])
-        assert (float(first['price_movement']['market_hours_last_movement_pct']) > 0)
+        assert "instrument_url" in first
+        assert "symbol" in first
+        assert "updated_at" in first
+        assert "price_movement" in first
+        assert "description" in first
+        assert "market_hours_last_movement_pct" in first["price_movement"]
+        assert "market_hours_last_price" in first["price_movement"]
+        assert float(first["price_movement"]["market_hours_last_movement_pct"]) > 0
         # going down
-        movers = r.get_top_movers_sp500('down')
-        assert (movers)
+        movers = r.get_top_movers_sp500("down")
+        assert movers
         first = movers[0]
-        assert (float(first['price_movement']['market_hours_last_movement_pct']) < 0)
+        assert float(first["price_movement"]["market_hours_last_movement_pct"]) < 0
 
     def test_get_all_stocks_from_market_tag(self):
-        movers = r.get_all_stocks_from_market_tag('technology')
-        assert (movers)
+        movers = r.get_all_stocks_from_market_tag("technology")
+        assert movers
         first = movers[0]
-        assert ('ask_price' in first)
-        assert ('ask_size' in first)
-        assert ('bid_price' in first)
-        assert ('bid_size' in first)
-        assert ('last_trade_price' in first)
-        assert ('last_extended_hours_trade_price' in first)
-        assert ('previous_close' in first)
-        assert ('adjusted_previous_close' in first)
-        assert ('previous_close_date' in first)
-        assert ('symbol' in first)
-        assert ('trading_halted' in first)
-        assert ('has_traded' in first)
-        assert ('last_trade_price_source' in first)
-        assert ('updated_at' in first)
-        assert ('instrument' in first)
+        assert "ask_price" in first
+        assert "ask_size" in first
+        assert "bid_price" in first
+        assert "bid_size" in first
+        assert "last_trade_price" in first
+        assert "last_extended_hours_trade_price" in first
+        assert "previous_close" in first
+        assert "adjusted_previous_close" in first
+        assert "previous_close_date" in first
+        assert "symbol" in first
+        assert "trading_halted" in first
+        assert "has_traded" in first
+        assert "last_trade_price_source" in first
+        assert "updated_at" in first
+        assert "instrument" in first
 
     def test_get_markets(self):
         markets = r.get_markets()
-        assert (markets)
+        assert markets
         first = markets[0]
-        assert ('url' in first)
-        assert ('todays_hours' in first)
-        assert ('mic' in first)
-        assert ('operating_mic' in first)
-        assert ('acronym' in first)
-        assert ('name' in first)
-        assert ('city' in first)
-        assert ('country' in first)
-        assert ('timezone' in first)
-        assert ('website' in first)
+        assert "url" in first
+        assert "todays_hours" in first
+        assert "mic" in first
+        assert "operating_mic" in first
+        assert "acronym" in first
+        assert "name" in first
+        assert "city" in first
+        assert "country" in first
+        assert "timezone" in first
+        assert "website" in first
 
     def test_get_market_today_hours(self):
         market = r.get_market_today_hours(self.nyse)
-        assert ('date' in market)
-        assert ('is_open' in market)
-        assert ('opens_at' in market)
-        assert ('closes_at' in market)
-        assert ('extended_opens_at' in market)
-        assert ('extended_closes_at' in market)
-        assert ('previous_open_hours' in market)
-        assert ('next_open_hours' in market)
+        assert "date" in market
+        assert "is_open" in market
+        assert "opens_at" in market
+        assert "closes_at" in market
+        assert "extended_opens_at" in market
+        assert "extended_closes_at" in market
+        assert "previous_open_hours" in market
+        assert "next_open_hours" in market
 
     def test_get_market_next_open_hours(self):
         market = r.get_market_next_open_hours(self.amex)
-        assert ('date' in market)
-        assert ('is_open' in market)
-        assert ('opens_at' in market)
-        assert ('closes_at' in market)
-        assert ('extended_opens_at' in market)
-        assert ('extended_closes_at' in market)
-        assert ('previous_open_hours' in market)
-        assert ('next_open_hours' in market)
+        assert "date" in market
+        assert "is_open" in market
+        assert "opens_at" in market
+        assert "closes_at" in market
+        assert "extended_opens_at" in market
+        assert "extended_closes_at" in market
+        assert "previous_open_hours" in market
+        assert "next_open_hours" in market
 
     def test_get_market_next_open_hours_after_date(self):
         market = r.get_market_next_open_hours_after_date(self.nasdaq, self.today)
-        assert ('date' in market)
-        assert ('is_open' in market)
-        assert ('opens_at' in market)
-        assert ('closes_at' in market)
-        assert ('extended_opens_at' in market)
-        assert ('extended_closes_at' in market)
-        assert ('previous_open_hours' in market)
-        assert ('next_open_hours' in market)
+        assert "date" in market
+        assert "is_open" in market
+        assert "opens_at" in market
+        assert "closes_at" in market
+        assert "extended_opens_at" in market
+        assert "extended_closes_at" in market
+        assert "previous_open_hours" in market
+        assert "next_open_hours" in market
 
     def test_get_market_hours(self):
         market = r.get_market_hours(self.nasdaq, self.today)
-        assert ('date' in market)
-        assert ('is_open' in market)
-        assert ('opens_at' in market)
-        assert ('closes_at' in market)
-        assert ('extended_opens_at' in market)
-        assert ('extended_closes_at' in market)
-        assert ('previous_open_hours' in market)
-        assert ('next_open_hours' in market)
+        assert "date" in market
+        assert "is_open" in market
+        assert "opens_at" in market
+        assert "closes_at" in market
+        assert "extended_opens_at" in market
+        assert "extended_closes_at" in market
+        assert "previous_open_hours" in market
+        assert "next_open_hours" in market
 
     def test_currency_pairs(self):
         currency = r.get_currency_pairs()
         assert currency
         first = currency[0]
-        assert ('asset_currency' in first)
-        assert ('display_only' in first)
-        assert ('id' in first)
-        assert ('max_order_size' in first)
-        assert ('min_order_size' in first)
-        assert ('min_order_price_increment' in first)
-        assert ('min_order_quantity_increment' in first)
-        assert ('name' in first)
-        assert ('quote_currency' in first)
-        assert ('symbol' in first)
-        assert ('tradability' in first)
+        assert "asset_currency" in first
+        assert "display_only" in first
+        assert "id" in first
+        assert "max_order_size" in first
+        assert "min_order_size" in first
+        assert "min_order_price_increment" in first
+        assert "min_order_quantity_increment" in first
+        assert "name" in first
+        assert "quote_currency" in first
+        assert "symbol" in first
+        assert "tradability" in first
 
     @pytest.mark.xfail()
     def test_market_fail(self):
@@ -632,11 +635,12 @@ class TestMarkets:
         market = r.get_market_hours(self.nasdaq, self.american_time)
         assert market
 
+
 class TestProfiles:
     @classmethod
     def setup_class(cls):
-        totp  = pyotp.TOTP(os.environ['robin_mfa']).now()
-        login = r.login(os.environ['robin_username'], os.environ['robin_password'], mfa_code=totp)
+        totp = pyotp.TOTP(os.environ["robin_mfa"]).now()
+        r.login(os.environ["robin_username"], os.environ["robin_password"], mfa_code=totp)
 
     @classmethod
     def teardown_class(cls):
@@ -645,167 +649,167 @@ class TestProfiles:
     def test_load_account_profile(self):
         profile = r.load_account_profile(info=None)
         assert profile
-        assert ('url' in profile)
-        assert ('portfolio_cash' in profile)
-        assert ('can_downgrade_to_cash' in profile)
-        assert ('user' in profile)
-        assert ('account_number' in profile)
-        assert ('type' in profile)
-        assert ('created_at' in profile)
-        assert ('updated_at' in profile)
-        assert ('deactivated' in profile)
-        assert ('deposit_halted' in profile)
-        assert ('only_position_closing_trades' in profile)
-        assert ('buying_power' in profile)
-        assert ('cash_available_for_withdrawal' in profile)
-        assert ('cash' in profile)
-        assert ('cash_held_for_orders' in profile)
-        assert ('uncleared_deposits' in profile)
-        assert ('sma' in profile)
-        assert ('sma_held_for_orders' in profile)
-        assert ('unsettled_funds' in profile)
-        assert ('unsettled_debit' in profile)
-        assert ('crypto_buying_power' in profile)
-        assert ('max_ach_early_access_amount' in profile)
-        assert ('cash_balances' in profile)
-        assert ('margin_balances' in profile)
-        assert ('sweep_enabled' in profile)
-        assert ('instant_eligibility' in profile)
-        assert ('option_level' in profile)
-        assert ('is_pinnacle_account' in profile)
-        assert ('rhs_account_number' in profile)
-        assert ('state' in profile)
-        assert ('active_subscription_id' in profile)
-        assert ('locked' in profile)
-        assert ('permanently_deactivated' in profile)
-        assert ('received_ach_debit_locked' in profile)
-        assert ('drip_enabled' in profile)
-        assert ('eligible_for_fractionals' in profile)
-        assert ('eligible_for_drip' in profile)
-        assert ('eligible_for_cash_management' in profile)
-        assert ('cash_management_enabled' in profile)
-        assert ('option_trading_on_expiration_enabled' in profile)
-        assert ('cash_held_for_options_collateral' in profile)
-        assert ('fractional_position_closing_only' in profile)
-        assert ('user_id' in profile)
+        assert "url" in profile
+        assert "portfolio_cash" in profile
+        assert "can_downgrade_to_cash" in profile
+        assert "user" in profile
+        assert "account_number" in profile
+        assert "type" in profile
+        assert "created_at" in profile
+        assert "updated_at" in profile
+        assert "deactivated" in profile
+        assert "deposit_halted" in profile
+        assert "only_position_closing_trades" in profile
+        assert "buying_power" in profile
+        assert "cash_available_for_withdrawal" in profile
+        assert "cash" in profile
+        assert "cash_held_for_orders" in profile
+        assert "uncleared_deposits" in profile
+        assert "sma" in profile
+        assert "sma_held_for_orders" in profile
+        assert "unsettled_funds" in profile
+        assert "unsettled_debit" in profile
+        assert "crypto_buying_power" in profile
+        assert "max_ach_early_access_amount" in profile
+        assert "cash_balances" in profile
+        assert "margin_balances" in profile
+        assert "sweep_enabled" in profile
+        assert "instant_eligibility" in profile
+        assert "option_level" in profile
+        assert "is_pinnacle_account" in profile
+        assert "rhs_account_number" in profile
+        assert "state" in profile
+        assert "active_subscription_id" in profile
+        assert "locked" in profile
+        assert "permanently_deactivated" in profile
+        assert "received_ach_debit_locked" in profile
+        assert "drip_enabled" in profile
+        assert "eligible_for_fractionals" in profile
+        assert "eligible_for_drip" in profile
+        assert "eligible_for_cash_management" in profile
+        assert "cash_management_enabled" in profile
+        assert "option_trading_on_expiration_enabled" in profile
+        assert "cash_held_for_options_collateral" in profile
+        assert "fractional_position_closing_only" in profile
+        assert "user_id" in profile
 
     def test_basic_profile(self):
         profile = r.load_basic_profile(info=None)
         assert profile
-        assert ('user' in profile)
-        assert ('address' in profile)
-        assert ('city' in profile)
-        assert ('state' in profile)
-        assert ('zipcode' in profile)
-        assert ('phone_number' in profile)
-        assert ('marital_status' in profile)
-        assert ('date_of_birth' in profile)
-        assert ('citizenship' in profile)
-        assert ('country_of_residence' in profile)
-        assert ('number_dependents' in profile)
-        assert ('signup_as_rhs' in profile)
-        assert ('tax_id_ssn' in profile)
-        assert ('updated_at' in profile)
+        assert "user" in profile
+        assert "address" in profile
+        assert "city" in profile
+        assert "state" in profile
+        assert "zipcode" in profile
+        assert "phone_number" in profile
+        assert "marital_status" in profile
+        assert "date_of_birth" in profile
+        assert "citizenship" in profile
+        assert "country_of_residence" in profile
+        assert "number_dependents" in profile
+        assert "signup_as_rhs" in profile
+        assert "tax_id_ssn" in profile
+        assert "updated_at" in profile
 
     def test_investment_profile(self):
         profile = r.load_investment_profile(info=None)
         assert profile
-        assert ('user' in profile)
-        assert ('total_net_worth' in profile)
-        assert ('annual_income' in profile)
-        assert ('source_of_funds' in profile)
-        assert ('investment_objective' in profile)
-        assert ('investment_experience' in profile)
-        assert ('liquid_net_worth' in profile)
-        assert ('risk_tolerance' in profile)
-        assert ('tax_bracket' in profile)
-        assert ('time_horizon' in profile)
-        assert ('liquidity_needs' in profile)
-        assert ('investment_experience_collected' in profile)
-        assert ('suitability_verified' in profile)
-        assert ('option_trading_experience' in profile)
-        assert ('professional_trader' in profile)
-        assert ('understand_option_spreads' in profile)
-        assert ('interested_in_options' in profile)
-        assert ('updated_at' in profile)
+        assert "user" in profile
+        assert "total_net_worth" in profile
+        assert "annual_income" in profile
+        assert "source_of_funds" in profile
+        assert "investment_objective" in profile
+        assert "investment_experience" in profile
+        assert "liquid_net_worth" in profile
+        assert "risk_tolerance" in profile
+        assert "tax_bracket" in profile
+        assert "time_horizon" in profile
+        assert "liquidity_needs" in profile
+        assert "investment_experience_collected" in profile
+        assert "suitability_verified" in profile
+        assert "option_trading_experience" in profile
+        assert "professional_trader" in profile
+        assert "understand_option_spreads" in profile
+        assert "interested_in_options" in profile
+        assert "updated_at" in profile
 
     def test_portfolio_profile(self):
         profile = r.load_portfolio_profile(info=None)
         assert profile
-        assert ('url' in profile)
-        assert ('account' in profile)
-        assert ('start_date' in profile)
-        assert ('market_value' in profile)
-        assert ('equity' in profile)
-        assert ('extended_hours_market_value' in profile)
-        assert ('extended_hours_equity' in profile)
-        assert ('extended_hours_portfolio_equity' in profile)
-        assert ('last_core_market_value' in profile)
-        assert ('last_core_equity' in profile)
-        assert ('last_core_portfolio_equity' in profile)
-        assert ('excess_margin' in profile)
-        assert ('excess_maintenance' in profile)
-        assert ('excess_margin_with_uncleared_deposits' in profile)
-        assert ('excess_maintenance_with_uncleared_deposits' in profile)
-        assert ('equity_previous_close' in profile)
-        assert ('portfolio_equity_previous_close' in profile)
-        assert ('adjusted_equity_previous_close' in profile)
-        assert ('adjusted_portfolio_equity_previous_close' in profile)
-        assert ('withdrawable_amount' in profile)
-        assert ('unwithdrawable_deposits' in profile)
-        assert ('unwithdrawable_grants' in profile)
+        assert "url" in profile
+        assert "account" in profile
+        assert "start_date" in profile
+        assert "market_value" in profile
+        assert "equity" in profile
+        assert "extended_hours_market_value" in profile
+        assert "extended_hours_equity" in profile
+        assert "extended_hours_portfolio_equity" in profile
+        assert "last_core_market_value" in profile
+        assert "last_core_equity" in profile
+        assert "last_core_portfolio_equity" in profile
+        assert "excess_margin" in profile
+        assert "excess_maintenance" in profile
+        assert "excess_margin_with_uncleared_deposits" in profile
+        assert "excess_maintenance_with_uncleared_deposits" in profile
+        assert "equity_previous_close" in profile
+        assert "portfolio_equity_previous_close" in profile
+        assert "adjusted_equity_previous_close" in profile
+        assert "adjusted_portfolio_equity_previous_close" in profile
+        assert "withdrawable_amount" in profile
+        assert "unwithdrawable_deposits" in profile
+        assert "unwithdrawable_grants" in profile
 
     def test_security_profile(self):
         profile = r.load_security_profile(info=None)
         assert profile
-        assert ('user' in profile)
-        assert ('object_to_disclosure' in profile)
-        assert ('sweep_consent' in profile)
-        assert ('control_person' in profile)
-        assert ('control_person_security_symbol' in profile)
-        assert ('security_affiliated_employee' in profile)
-        assert ('security_affiliated_firm_relationship' in profile)
-        assert ('security_affiliated_firm_name' in profile)
-        assert ('security_affiliated_person_name' in profile)
-        assert ('security_affiliated_address' in profile)
-        assert ('security_affiliated_address_subject' in profile)
-        assert ('security_affiliated_requires_duplicates' in profile)
-        assert ('stock_loan_consent_status' in profile)
-        assert ('agreed_to_rhs' in profile)
-        assert ('agreed_to_rhs_margin' in profile)
-        assert ('rhs_stock_loan_consent_status' in profile)
-        assert ('updated_at' in profile)
+        assert "user" in profile
+        assert "object_to_disclosure" in profile
+        assert "sweep_consent" in profile
+        assert "control_person" in profile
+        assert "control_person_security_symbol" in profile
+        assert "security_affiliated_employee" in profile
+        assert "security_affiliated_firm_relationship" in profile
+        assert "security_affiliated_firm_name" in profile
+        assert "security_affiliated_person_name" in profile
+        assert "security_affiliated_address" in profile
+        assert "security_affiliated_address_subject" in profile
+        assert "security_affiliated_requires_duplicates" in profile
+        assert "stock_loan_consent_status" in profile
+        assert "agreed_to_rhs" in profile
+        assert "agreed_to_rhs_margin" in profile
+        assert "rhs_stock_loan_consent_status" in profile
+        assert "updated_at" in profile
 
     def test_user_profile(self):
         profile = r.load_user_profile(info=None)
         assert profile
-        assert ('url' in profile)
-        assert ('id' in profile)
-        assert ('id_info' in profile)
-        assert ('username' in profile)
-        assert ('email' in profile)
-        assert ('email_verified' in profile)
-        assert ('first_name' in profile)
-        assert ('last_name' in profile)
-        assert ('origin' in profile)
-        assert ('profile_name' in profile)
-        assert ('created_at' in profile)
+        assert "url" in profile
+        assert "id" in profile
+        assert "id_info" in profile
+        assert "username" in profile
+        assert "email" in profile
+        assert "email_verified" in profile
+        assert "first_name" in profile
+        assert "last_name" in profile
+        assert "origin" in profile
+        assert "profile_name" in profile
+        assert "created_at" in profile
 
     def test_crypto_profile(self):
         profile = r.load_crypto_profile(info=None)
         assert profile
-        assert ('apex_account_number' in profile)
-        assert ('created_at' in profile)
-        assert ('id' in profile)
-        assert ('rhs_account_number' in profile)
-        assert ('status' in profile)
-        assert ('status_reason_code' in profile)
-        assert ('updated_at' in profile)
-        assert ('user_id' in profile)
+        assert "apex_account_number" in profile
+        assert "created_at" in profile
+        assert "id" in profile
+        assert "rhs_account_number" in profile
+        assert "status" in profile
+        assert "status_reason_code" in profile
+        assert "updated_at" in profile
+        assert "user_id" in profile
 
     @pytest.mark.xfail()
     def test_key_failed(self):
-        profile = r.load_account_profile(info='cheese')
+        profile = r.load_account_profile(info="cheese")
         assert profile
 
     @pytest.mark.xfail()
@@ -814,12 +818,13 @@ class TestProfiles:
         profile = r.load_account_profile(info=None)
         assert profile
 
+
 class TestOrders:
     @classmethod
     def setup_class(cls):
-        totp  = pyotp.TOTP(os.environ['robin_mfa']).now()
-        login = r.login(os.environ['robin_username'], os.environ['robin_password'], mfa_code=totp)
-    
+        totp = pyotp.TOTP(os.environ["robin_mfa"]).now()
+        r.login(os.environ["robin_username"], os.environ["robin_password"], mfa_code=totp)
+
     def test_find_stock_orders(cls):
         def isFloat(f):
             try:
@@ -832,17 +837,18 @@ class TestOrders:
         assert orderHistory
 
         for order in orderHistory:
-            assert isFloat(order['quantity'])
-            assert isFloat(order['cumulative_quantity'])
-            if(order['state'] == 'filled'):
-                assert (order['quantity'] == order['cumulative_quantity'])
-                
+            assert isFloat(order["quantity"])
+            assert isFloat(order["cumulative_quantity"])
+            if order["state"] == "filled":
+                assert order["quantity"] == order["cumulative_quantity"]
+
+
 class TestAccountInformation:
     @classmethod
     def setup_class(cls):
-        totp  = pyotp.TOTP(os.environ['robin_mfa']).now()
-        login = r.login(os.environ['robin_username'], os.environ['robin_password'], mfa_code=totp)
-    
+        totp = pyotp.TOTP(os.environ["robin_mfa"]).now()
+        r.login(os.environ["robin_username"], os.environ["robin_password"], mfa_code=totp)
+
     def test_get_stock_loan_payments(cls):
         def isFloat(f):
             try:
@@ -854,11 +860,11 @@ class TestAccountInformation:
         loanPayments = r.get_stock_loan_payments()
         assert loanPayments
         for payment in loanPayments:
-            assert ('amount' in payment)
-            assert isFloat(payment['amount']['amount'])
-            assert ('symbol' in payment)
-            assert ('description' in payment)
-        
+            assert "amount" in payment
+            assert isFloat(payment["amount"]["amount"])
+            assert "symbol" in payment
+            assert "description" in payment
+
     def test_get_interest_payments(cls):
         def isFloat(f):
             try:
@@ -868,23 +874,23 @@ class TestAccountInformation:
                 return False
 
         interests = r.get_interest_payments()
-        assert (interests)
+        assert interests
         for interest in interests:
-            assert ('amount' in interest)
-            assert isFloat(interest['amount']['amount'])
-            assert ('direction' in interest)
-            assert ('payout_type' in interest)
-            assert ('reason' in interest)
+            assert "amount" in interest
+            assert isFloat(interest["amount"]["amount"])
+            assert "direction" in interest
+            assert "payout_type" in interest
+            assert "reason" in interest
 
 
 class TestTaxLots:
-    fake_symbol = 'thisisfake'
-    fake_order_id = '00000000-0000-0000-0000-000000000000'
+    fake_symbol = "thisisfake"
+    fake_order_id = "00000000-0000-0000-0000-000000000000"
 
     @classmethod
     def setup_class(cls):
-        totp = pyotp.TOTP(os.environ['robin_mfa']).now()
-        login = r.login(os.environ['robin_username'], os.environ['robin_password'], mfa_code=totp)
+        totp = pyotp.TOTP(os.environ["robin_mfa"]).now()
+        r.login(os.environ["robin_username"], os.environ["robin_password"], mfa_code=totp)
 
     @classmethod
     def teardown_class(cls):
@@ -893,34 +899,34 @@ class TestTaxLots:
     def test_get_tax_lots_for_held_position(self):
         positions = r.get_open_stock_positions()
         if not positions:
-            pytest.skip('Test account has no open stock positions')
+            pytest.skip("Test account has no open stock positions")
         symbol = None
         for p in positions:
-            if float(p.get('quantity', '0')) > 0:
-                symbol = r.get_instrument_by_url(p['instrument'], info='symbol')
+            if float(p.get("quantity", "0")) > 0:
+                symbol = r.get_instrument_by_url(p["instrument"], info="symbol")
                 if symbol:
                     break
         if not symbol:
-            pytest.skip('No held position resolvable to a symbol')
+            pytest.skip("No held position resolvable to a symbol")
         lots = r.get_tax_lots(symbol)
         assert isinstance(lots, list)
         if not lots or lots == [None]:
-            pytest.skip('Held position has no tax lots returned (e.g. legacy holding)')
+            pytest.skip("Held position has no tax lots returned (e.g. legacy holding)")
         lot = lots[0]
-        assert ('account_number' in lot)
-        assert ('instrument_id' in lot)
-        assert ('open_lot_id' in lot)
-        assert ('open_tran_type' in lot)
-        assert ('order_id' in lot)
-        assert ('quantity' in lot)
-        assert ('quantity_available' in lot)
-        assert ('book_cost_basis' in lot)
-        assert ('tax_cost_basis' in lot)
-        assert ('book_proceeds' in lot)
-        assert ('open_date' in lot)
-        assert ('term' in lot)
-        assert ('is_selectable' in lot)
-        assert ('cost_per_share' in lot)
+        assert "account_number" in lot
+        assert "instrument_id" in lot
+        assert "open_lot_id" in lot
+        assert "open_tran_type" in lot
+        assert "order_id" in lot
+        assert "quantity" in lot
+        assert "quantity_available" in lot
+        assert "book_cost_basis" in lot
+        assert "tax_cost_basis" in lot
+        assert "book_proceeds" in lot
+        assert "open_date" in lot
+        assert "term" in lot
+        assert "is_selectable" in lot
+        assert "cost_per_share" in lot
 
     def test_get_tax_lots_unknown_symbol(self):
         result = r.get_tax_lots(self.fake_symbol)
@@ -943,14 +949,14 @@ class TestFutures:
 
     # Test symbols - using common E-mini futures contracts
     # These should be updated to use current/future expiration dates
-    es_symbol = 'ESH26'  # E-mini S&P 500 March 2026
-    nq_symbol = 'NQH26'  # E-mini Nasdaq-100 March 2026
-    fake_symbol = 'FAKEFUTURE'
+    es_symbol = "ESH26"  # E-mini S&P 500 March 2026
+    nq_symbol = "NQH26"  # E-mini Nasdaq-100 March 2026
+    fake_symbol = "FAKEFUTURE"
 
     @classmethod
     def setup_class(cls):
-        totp = pyotp.TOTP(os.environ['robin_mfa']).now()
-        login = r.login(os.environ['robin_username'], os.environ['robin_password'], mfa_code=totp)
+        totp = pyotp.TOTP(os.environ["robin_mfa"]).now()
+        r.login(os.environ["robin_username"], os.environ["robin_password"], mfa_code=totp)
 
     @classmethod
     def teardown_class(cls):
@@ -960,24 +966,24 @@ class TestFutures:
         """Test getting a single futures contract by symbol."""
         contract = r.get_futures_contract(self.es_symbol, info=None)
         assert contract
-        assert ('id' in contract)
-        assert ('symbol' in contract)
-        assert ('displaySymbol' in contract)
-        assert ('description' in contract)
-        assert ('multiplier' in contract)
-        assert ('expiration' in contract)
-        assert ('tradability' in contract)
-        assert ('state' in contract)
+        assert "id" in contract
+        assert "symbol" in contract
+        assert "displaySymbol" in contract
+        assert "description" in contract
+        assert "multiplier" in contract
+        assert "expiration" in contract
+        assert "tradability" in contract
+        assert "state" in contract
         # Check that displaySymbol matches what we requested
-        assert self.es_symbol in contract['displaySymbol']
+        assert self.es_symbol in contract["displaySymbol"]
 
     def test_get_futures_contract_with_info(self):
         """Test filtering contract data with info parameter."""
-        contract_id = r.get_futures_contract(self.es_symbol, info='id')
+        contract_id = r.get_futures_contract(self.es_symbol, info="id")
         assert contract_id
         assert isinstance(contract_id, str)
 
-        description = r.get_futures_contract(self.es_symbol, info='description')
+        description = r.get_futures_contract(self.es_symbol, info="description")
         assert description
         assert isinstance(description, str)
 
@@ -989,9 +995,9 @@ class TestFutures:
 
         # Check both contracts have required fields
         for contract in contracts:
-            assert ('id' in contract)
-            assert ('symbol' in contract)
-            assert ('displaySymbol' in contract)
+            assert "id" in contract
+            assert "symbol" in contract
+            assert "displaySymbol" in contract
 
     def test_get_futures_contract_fake_symbol(self):
         """Test that fake symbols return None."""
@@ -1002,26 +1008,26 @@ class TestFutures:
         """Test getting a real-time futures quote."""
         quote = r.get_futures_quote(self.es_symbol, info=None)
         assert quote
-        assert ('bid_price' in quote)
-        assert ('bid_size' in quote)
-        assert ('ask_price' in quote)
-        assert ('ask_size' in quote)
-        assert ('last_trade_price' in quote)
-        assert ('last_trade_size' in quote)
-        assert ('state' in quote)
-        assert ('updated_at' in quote)
-        assert ('instrument_id' in quote)
+        assert "bid_price" in quote
+        assert "bid_size" in quote
+        assert "ask_price" in quote
+        assert "ask_size" in quote
+        assert "last_trade_price" in quote
+        assert "last_trade_size" in quote
+        assert "state" in quote
+        assert "updated_at" in quote
+        assert "instrument_id" in quote
 
     def test_get_futures_quote_with_info(self):
         """Test filtering quote data with info parameter."""
-        last_price = r.get_futures_quote(self.es_symbol, info='last_trade_price')
+        last_price = r.get_futures_quote(self.es_symbol, info="last_trade_price")
         assert last_price
         # Should be a string that can be converted to float
         try:
             float(last_price)
             assert True
         except (ValueError, TypeError):
-            assert False, "last_trade_price should be numeric"
+            raise AssertionError("last_trade_price should be numeric") from None
 
     def test_get_futures_quotes(self):
         """Test getting quotes for multiple futures."""
@@ -1030,87 +1036,87 @@ class TestFutures:
         assert len(quotes) == 2
 
         for quote in quotes:
-            assert ('bid_price' in quote)
-            assert ('ask_price' in quote)
-            assert ('last_trade_price' in quote)
+            assert "bid_price" in quote
+            assert "ask_price" in quote
+            assert "last_trade_price" in quote
 
     def test_extract_futures_pnl(self):
         """Test P&L extraction helper with sample data."""
         # Sample order structure matching Robinhood's nested format
         sample_order = {
-            'realizedPnl': {
-                'realizedPnl': {'amount': '-50.00', 'currency': 'USD'},
-                'realizedPnlWithoutFees': {'amount': '-46.90', 'currency': 'USD'}
+            "realizedPnl": {
+                "realizedPnl": {"amount": "-50.00", "currency": "USD"},
+                "realizedPnlWithoutFees": {"amount": "-46.90", "currency": "USD"},
             },
-            'totalFee': {'amount': '3.10', 'currency': 'USD'},
-            'totalCommission': {'amount': '2.48', 'currency': 'USD'},
-            'totalGoldSavings': {'amount': '0.62', 'currency': 'USD'}
+            "totalFee": {"amount": "3.10", "currency": "USD"},
+            "totalCommission": {"amount": "2.48", "currency": "USD"},
+            "totalGoldSavings": {"amount": "0.62", "currency": "USD"},
         }
 
         pnl = r.extract_futures_pnl(sample_order)
         assert pnl
-        assert 'realized_pnl' in pnl
-        assert 'realized_pnl_without_fees' in pnl
-        assert 'total_fee' in pnl
-        assert 'total_commission' in pnl
-        assert 'total_gold_savings' in pnl
+        assert "realized_pnl" in pnl
+        assert "realized_pnl_without_fees" in pnl
+        assert "total_fee" in pnl
+        assert "total_commission" in pnl
+        assert "total_gold_savings" in pnl
 
         # Check extracted values
-        assert abs(pnl['realized_pnl'] - (-50.00)) < 0.01
-        assert abs(pnl['realized_pnl_without_fees'] - (-46.90)) < 0.01
-        assert abs(pnl['total_fee'] - 3.10) < 0.01
-        assert abs(pnl['total_commission'] - 2.48) < 0.01
-        assert abs(pnl['total_gold_savings'] - 0.62) < 0.01
+        assert abs(pnl["realized_pnl"] - (-50.00)) < 0.01
+        assert abs(pnl["realized_pnl_without_fees"] - (-46.90)) < 0.01
+        assert abs(pnl["total_fee"] - 3.10) < 0.01
+        assert abs(pnl["total_commission"] - 2.48) < 0.01
+        assert abs(pnl["total_gold_savings"] - 0.62) < 0.01
 
     def test_extract_futures_pnl_empty(self):
         """Test P&L extraction with empty/None order."""
         pnl = r.extract_futures_pnl(None)
         assert pnl
-        assert pnl['realized_pnl'] == 0.0
-        assert pnl['total_fee'] == 0.0
+        assert pnl["realized_pnl"] == 0.0
+        assert pnl["total_fee"] == 0.0
 
     def test_calculate_total_futures_pnl(self):
         """Test aggregate P&L calculation."""
         sample_orders = [
             {
-                'realizedPnl': {
-                    'realizedPnl': {'amount': '100.00', 'currency': 'USD'},
-                    'realizedPnlWithoutFees': {'amount': '103.10', 'currency': 'USD'}
+                "realizedPnl": {
+                    "realizedPnl": {"amount": "100.00", "currency": "USD"},
+                    "realizedPnlWithoutFees": {"amount": "103.10", "currency": "USD"},
                 },
-                'totalFee': {'amount': '3.10', 'currency': 'USD'},
-                'totalCommission': {'amount': '2.48', 'currency': 'USD'},
-                'totalGoldSavings': {'amount': '0.62', 'currency': 'USD'}
+                "totalFee": {"amount": "3.10", "currency": "USD"},
+                "totalCommission": {"amount": "2.48", "currency": "USD"},
+                "totalGoldSavings": {"amount": "0.62", "currency": "USD"},
             },
             {
-                'realizedPnl': {
-                    'realizedPnl': {'amount': '-50.00', 'currency': 'USD'},
-                    'realizedPnlWithoutFees': {'amount': '-46.90', 'currency': 'USD'}
+                "realizedPnl": {
+                    "realizedPnl": {"amount": "-50.00", "currency": "USD"},
+                    "realizedPnlWithoutFees": {"amount": "-46.90", "currency": "USD"},
                 },
-                'totalFee': {'amount': '3.10', 'currency': 'USD'},
-                'totalCommission': {'amount': '2.48', 'currency': 'USD'},
-                'totalGoldSavings': {'amount': '0.62', 'currency': 'USD'}
-            }
+                "totalFee": {"amount": "3.10", "currency": "USD"},
+                "totalCommission": {"amount": "2.48", "currency": "USD"},
+                "totalGoldSavings": {"amount": "0.62", "currency": "USD"},
+            },
         ]
 
         totals = r.calculate_total_futures_pnl(sample_orders)
         assert totals
-        assert 'total_pnl' in totals
-        assert 'total_pnl_without_fees' in totals
-        assert 'total_fees' in totals
-        assert 'num_orders' in totals
+        assert "total_pnl" in totals
+        assert "total_pnl_without_fees" in totals
+        assert "total_fees" in totals
+        assert "num_orders" in totals
 
         # Check calculated totals
-        assert totals['num_orders'] == 2
-        assert abs(totals['total_pnl'] - 50.00) < 0.01  # 100 - 50
-        assert abs(totals['total_pnl_without_fees'] - 56.20) < 0.01  # 103.10 - 46.90
-        assert abs(totals['total_fees'] - 6.20) < 0.01  # 3.10 * 2
+        assert totals["num_orders"] == 2
+        assert abs(totals["total_pnl"] - 50.00) < 0.01  # 100 - 50
+        assert abs(totals["total_pnl_without_fees"] - 56.20) < 0.01  # 103.10 - 46.90
+        assert abs(totals["total_fees"] - 6.20) < 0.01  # 3.10 * 2
 
     def test_calculate_total_futures_pnl_empty(self):
         """Test aggregate P&L with empty list."""
         totals = r.calculate_total_futures_pnl([])
         assert totals
-        assert totals['num_orders'] == 0
-        assert totals['total_pnl'] == 0.0
+        assert totals["num_orders"] == 0
+        assert totals["total_pnl"] == 0.0
 
     def test_get_futures_account_id(self):
         """Test futures account ID retrieval."""
@@ -1132,9 +1138,9 @@ class TestFutures:
         # If no orders, that's also valid (empty list)
         if len(orders) > 0:
             first_order = orders[0]
-            assert 'orderId' in first_order
-            assert 'orderState' in first_order
-            assert 'createdAt' in first_order
+            assert "orderId" in first_order
+            assert "orderState" in first_order
+            assert "createdAt" in first_order
 
     def test_get_filled_futures_orders(self):
         """Test getting only filled futures orders."""
@@ -1144,7 +1150,7 @@ class TestFutures:
         assert isinstance(orders, list)
         # All returned orders should be filled
         for order in orders:
-            assert order.get('orderState') == 'FILLED'
+            assert order.get("orderState") == "FILLED"
 
     def test_get_futures_positions(self):
         """Test futures positions retrieval (currently a placeholder)."""

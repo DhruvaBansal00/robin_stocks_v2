@@ -1,4 +1,5 @@
-""" Module contains all the API endpoints """
+"""Module contains all the API endpoints"""
+
 from enum import Enum, auto
 from re import IGNORECASE, match, split
 
@@ -14,18 +15,19 @@ class AutoName(Enum):
 
 class Version(AutoName):
     """Enum for different version types"""
+
     v1 = auto()
     v2 = auto()
 
 
 class URLS:
-    """ Static class for holding all urls."""
+    """Static class for holding all urls."""
+
     __base_url = "https://api.gemini.com"
     __base_sandbox_url = "https://api.sandbox.gemini.com"
 
     def __init__(self):
-        raise NotImplementedError(
-            "Cannot create instance of {0}".format(self.__class__.__name__))
+        raise NotImplementedError(f"Cannot create instance of {self.__class__.__name__}")
 
     @classmethod
     def get_base_url(cls, version):
@@ -39,12 +41,12 @@ class URLS:
     @classmethod
     def get_endpoint(cls, url):
         if match(cls.__base_sandbox_url, url, IGNORECASE):
-            _, end = split(cls.__base_sandbox_url, url, IGNORECASE)
+            _, end = split(cls.__base_sandbox_url, url, flags=IGNORECASE)
         elif match(cls.__base_url, url, IGNORECASE):
-            _, end = split(cls.__base_url, url, IGNORECASE)
+            _, end = split(cls.__base_url, url, flags=IGNORECASE)
         else:
             raise ValueError("The URL has the wrong base.")
-        
+
         return end
 
     # account.py
@@ -66,15 +68,15 @@ class URLS:
 
     @classmethod
     def deposit_addresses(cls, network):
-        return cls.get_base_url(Version.v1) + "addresses/{0}".format(network)
+        return cls.get_base_url(Version.v1) + f"addresses/{network}"
 
     @classmethod
     def approved_addresses(cls, network):
-        return cls.get_base_url(Version.v1) + "approvedAddresses/account/{0}".format(network)
+        return cls.get_base_url(Version.v1) + f"approvedAddresses/account/{network}"
 
     @classmethod
     def withdrawl_crypto(cls, currency_code):
-        return cls.get_base_url(Version.v1) + "withdraw/{0}".format(currency_code)
+        return cls.get_base_url(Version.v1) + f"withdraw/{currency_code}"
 
     # authentication.py
     @classmethod
@@ -84,11 +86,11 @@ class URLS:
     # crypto.py
     @classmethod
     def pubticker(cls, ticker):
-        return cls.get_base_url(Version.v1) + "pubticker/{0}".format(ticker)
+        return cls.get_base_url(Version.v1) + f"pubticker/{ticker}"
 
     @classmethod
     def ticker(cls, ticker):
-        return cls.get_base_url(Version.v2) + "ticker/{0}".format(ticker)
+        return cls.get_base_url(Version.v2) + f"ticker/{ticker}"
 
     @classmethod
     def symbols(cls):
@@ -96,7 +98,7 @@ class URLS:
 
     @classmethod
     def symbol_details(cls, ticker):
-        return cls.get_base_url(Version.v1) + "symbols/details/{0}".format(ticker)
+        return cls.get_base_url(Version.v1) + f"symbols/details/{ticker}"
 
     @classmethod
     def notional_volume(cls):

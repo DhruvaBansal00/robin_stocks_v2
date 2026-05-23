@@ -1,17 +1,17 @@
-import json
 import base64
+import json
 from datetime import datetime, timedelta
 from pathlib import Path
 
 from cryptography.fernet import Fernet
+
 from robin_stocks.tda.globals import DATA_DIR_NAME, PICKLE_NAME
-from robin_stocks.tda.helper import (request_data, set_login_state,
-                                     update_session)
+from robin_stocks.tda.helper import request_data, set_login_state, update_session
 from robin_stocks.tda.urls import URLS
 
 
 def login_first_time(encryption_passcode, client_id, authorization_token, refresh_token):
-    """ Stores log in information in a session file on the computer. After being used once,
+    """Stores log in information in a session file on the computer. After being used once,
     user can call login() to automatically read in information from session file and refresh
     authorization tokens when needed.
 
@@ -39,16 +39,19 @@ def login_first_time(encryption_passcode, client_id, authorization_token, refres
     with session_path.open("w") as session_file:
         json.dump(
             {
-                'authorization_token': base64.b64encode(cipher_suite.encrypt(authorization_token.encode())).decode(),
-                'refresh_token': base64.b64encode(cipher_suite.encrypt(refresh_token.encode())).decode(),
-                'client_id': base64.b64encode(cipher_suite.encrypt(client_id.encode())).decode(),
-                'authorization_timestamp': datetime.now().isoformat(),
-                'refresh_timestamp': datetime.now().isoformat()
-            }, session_file, indent=2)
+                "authorization_token": base64.b64encode(cipher_suite.encrypt(authorization_token.encode())).decode(),
+                "refresh_token": base64.b64encode(cipher_suite.encrypt(refresh_token.encode())).decode(),
+                "client_id": base64.b64encode(cipher_suite.encrypt(client_id.encode())).decode(),
+                "authorization_timestamp": datetime.now().isoformat(),
+                "refresh_timestamp": datetime.now().isoformat(),
+            },
+            session_file,
+            indent=2,
+        )
 
 
 def login(encryption_passcode):
-    """ Set the authorization token so the API can be used. Gets a new authorization token
+    """Set the authorization token so the API can be used. Gets a new authorization token
     every 30 minutes using the refresh token. Gets a new refresh token every 60 days.
 
     :param encryption_passcode: Encryption key created by generate_encryption_passcode().
@@ -62,16 +65,15 @@ def login(encryption_passcode):
     data_dir = Path.home().joinpath(DATA_DIR_NAME)
     session_path = data_dir.joinpath(PICKLE_NAME)
     if not session_path.exists():
-        raise FileExistsError(
-            "Please Call login_first_time() to create session file.")
+        raise FileExistsError("Please Call login_first_time() to create session file.")
     # Read the information from the session file.
     with session_path.open("r") as session_file:
         session_data = json.load(session_file)
-        access_token = cipher_suite.decrypt(base64.b64decode(session_data['authorization_token'])).decode()
-        refresh_token = cipher_suite.decrypt(base64.b64decode(session_data['refresh_token'])).decode()
-        client_id = cipher_suite.decrypt(base64.b64decode(session_data['client_id'])).decode()
-        authorization_timestamp = datetime.fromisoformat(session_data['authorization_timestamp'])
-        refresh_timestamp = datetime.fromisoformat(session_data['refresh_timestamp'])
+        access_token = cipher_suite.decrypt(base64.b64decode(session_data["authorization_token"])).decode()
+        refresh_token = cipher_suite.decrypt(base64.b64decode(session_data["refresh_token"])).decode()
+        client_id = cipher_suite.decrypt(base64.b64decode(session_data["client_id"])).decode()
+        authorization_timestamp = datetime.fromisoformat(session_data["authorization_timestamp"])
+        refresh_timestamp = datetime.fromisoformat(session_data["refresh_timestamp"])
     # Authorization tokens expire after 30 mins. Refresh tokens expire after 90 days,
     # but you need to request a fresh authorization and refresh token before it expires.
     authorization_delta = timedelta(seconds=1800)
@@ -79,51 +81,51 @@ def login(encryption_passcode):
     url = URLS.oauth()
     # If it has been longer than 60 days. Get a new refresh and authorization token.
     # Else if it has been longer than 30 minutes, get only a new authorization token.
-    if (datetime.now() - refresh_timestamp > refresh_delta):
+    if datetime.now() - refresh_timestamp > refresh_delta:
         payload = {
             "grant_type": "refresh_token",
             "access_type": "offline",
             "refresh_token": refresh_token,
-            "client_id": client_id
+            "client_id": client_id,
         }
         data, _ = request_data(url, payload, True)
         if "access_token" not in data and "refresh_token" not in data:
-            raise ValueError(
-                "Refresh token is no longer valid. Call login_first_time() to get a new refresh token.")
+            raise ValueError("Refresh token is no longer valid. Call login_first_time() to get a new refresh token.")
         access_token = data["access_token"]
         refresh_token = data["refresh_token"]
         with session_path.open("w") as session_file:
             json.dump(
                 {
-                    'authorization_token': base64.b64encode(cipher_suite.encrypt(access_token.encode())).decode(),
-                    'refresh_token': base64.b64encode(cipher_suite.encrypt(refresh_token.encode())).decode(),
-                    'client_id': base64.b64encode(cipher_suite.encrypt(client_id.encode())).decode(),
-                    'authorization_timestamp': datetime.now().isoformat(),
-                    'refresh_timestamp': datetime.now().isoformat()
-                }, session_file, indent=2)
-    elif (datetime.now() - authorization_timestamp > authorization_delta):
-        payload = {
-            "grant_type": "refresh_token",
-            "refresh_token": refresh_token,
-            "client_id": client_id
-        }
+                    "authorization_token": base64.b64encode(cipher_suite.encrypt(access_token.encode())).decode(),
+                    "refresh_token": base64.b64encode(cipher_suite.encrypt(refresh_token.encode())).decode(),
+                    "client_id": base64.b64encode(cipher_suite.encrypt(client_id.encode())).decode(),
+                    "authorization_timestamp": datetime.now().isoformat(),
+                    "refresh_timestamp": datetime.now().isoformat(),
+                },
+                session_file,
+                indent=2,
+            )
+    elif datetime.now() - authorization_timestamp > authorization_delta:
+        payload = {"grant_type": "refresh_token", "refresh_token": refresh_token, "client_id": client_id}
         data, _ = request_data(url, payload, True)
         if "access_token" not in data:
-            raise ValueError(
-                "Refresh token is no longer valid. Call login_first_time() to get a new refresh token.")
+            raise ValueError("Refresh token is no longer valid. Call login_first_time() to get a new refresh token.")
         access_token = data["access_token"]
         # Write new data to file. Do not replace the refresh timestamp.
         with session_path.open("w") as session_file:
             json.dump(
                 {
-                    'authorization_token': base64.b64encode(cipher_suite.encrypt(access_token.encode())).decode(),
-                    'refresh_token': base64.b64encode(cipher_suite.encrypt(refresh_token.encode())).decode(),
-                    'client_id': base64.b64encode(cipher_suite.encrypt(client_id.encode())).decode(),
-                    'authorization_timestamp': datetime.now().isoformat(),
-                    'refresh_timestamp': refresh_timestamp.isoformat()
-                }, session_file, indent=2)
+                    "authorization_token": base64.b64encode(cipher_suite.encrypt(access_token.encode())).decode(),
+                    "refresh_token": base64.b64encode(cipher_suite.encrypt(refresh_token.encode())).decode(),
+                    "client_id": base64.b64encode(cipher_suite.encrypt(client_id.encode())).decode(),
+                    "authorization_timestamp": datetime.now().isoformat(),
+                    "refresh_timestamp": refresh_timestamp.isoformat(),
+                },
+                session_file,
+                indent=2,
+            )
     # Store authorization token in session information to be used with API calls.
-    auth_token = "Bearer {0}".format(access_token)
+    auth_token = f"Bearer {access_token}"
     update_session("Authorization", auth_token)
     update_session("apikey", client_id)
     set_login_state(True)
@@ -131,7 +133,7 @@ def login(encryption_passcode):
 
 
 def generate_encryption_passcode():
-    """ Returns an encryption key to be used for logging in.
+    """Returns an encryption key to be used for logging in.
 
     :returns: Returns a byte object to be used with cryptography.
 

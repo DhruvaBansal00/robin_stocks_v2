@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 import robin_stocks.robinhood as rh
 
@@ -13,12 +13,12 @@ from ..runtime import safe_tool, to_thread
 @mcp.tool()
 @safe_tool()
 async def rh_login(
-    username: Optional[str] = None,
-    password: Optional[str] = None,
+    username: str | None = None,
+    password: str | None = None,
     expiresIn: int = 86400,
     scope: str = "internal",
     store_session: bool = True,
-    mfa_code: Optional[str] = None,
+    mfa_code: str | None = None,
     pickle_path: str = "",
     pickle_name: str = "",
 ) -> Any:

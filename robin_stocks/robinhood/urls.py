@@ -1,243 +1,266 @@
 """Contains all the url endpoints for interacting with Robinhood API."""
+
 from robin_stocks.robinhood.helper import id_for_chain, id_for_stock
 
 # Login
 
 
 def login_url():
-    return('https://api.robinhood.com/oauth2/token/')
+    return "https://api.robinhood.com/oauth2/token/"
 
 
 def challenge_url(challenge_id):
-    return('https://api.robinhood.com/challenge/{0}/respond/'.format(challenge_id))
+    return f"https://api.robinhood.com/challenge/{challenge_id}/respond/"
+
 
 # Profiles
 
 
 def account_profile_url(account_number=None):
     if account_number:
-        return('https://api.robinhood.com/accounts/'+account_number)
+        return "https://api.robinhood.com/accounts/" + account_number
     else:
-        return('https://api.robinhood.com/accounts/?default_to_all_accounts=true')
+        return "https://api.robinhood.com/accounts/?default_to_all_accounts=true"
 
 
 def basic_profile_url():
-    return('https://api.robinhood.com/user/basic_info/')
+    return "https://api.robinhood.com/user/basic_info/"
 
 
 def investment_profile_url():
-    return('https://api.robinhood.com/user/investment_profile/')
+    return "https://api.robinhood.com/user/investment_profile/"
 
 
 def portfolio_profile_url(account_number=None):
     if account_number:
-        return('https://api.robinhood.com/portfolios/'+account_number)
+        return "https://api.robinhood.com/portfolios/" + account_number
     else:
-        return('https://api.robinhood.com/portfolios/')
+        return "https://api.robinhood.com/portfolios/"
 
 
 def security_profile_url():
-    return('https://api.robinhood.com/user/additional_info/')
+    return "https://api.robinhood.com/user/additional_info/"
 
 
 def user_profile_url():
-    return('https://api.robinhood.com/user/')
+    return "https://api.robinhood.com/user/"
+
 
 def portfolis_historicals_url(account_number):
-    return('https://api.robinhood.com/portfolios/historicals/{0}/'.format(account_number))
+    return f"https://api.robinhood.com/portfolios/historicals/{account_number}/"
+
 
 # Stocks
 
 
 def earnings_url():
-    return('https://api.robinhood.com/marketdata/earnings/')
+    return "https://api.robinhood.com/marketdata/earnings/"
 
 
 def events_url():
-    return('https://api.robinhood.com/options/events/')
+    return "https://api.robinhood.com/options/events/"
 
 
 def fundamentals_url():
-    return('https://api.robinhood.com/fundamentals/')
+    return "https://api.robinhood.com/fundamentals/"
 
 
 def historicals_url():
-    return('https://api.robinhood.com/quotes/historicals/')
+    return "https://api.robinhood.com/quotes/historicals/"
 
 
 def instruments_url():
-    return('https://api.robinhood.com/instruments/')
+    return "https://api.robinhood.com/instruments/"
 
 
 def news_url(symbol):
-    return('https://api.robinhood.com/midlands/news/{0}/?'.format(symbol))
+    return f"https://api.robinhood.com/midlands/news/{symbol}/?"
 
 
 def popularity_url(symbol):
-    return('https://api.robinhood.com/instruments/{0}/popularity/'.format(id_for_stock(symbol)))
+    return f"https://api.robinhood.com/instruments/{id_for_stock(symbol)}/popularity/"
+
 
 def quotes_url():
-    return('https://api.robinhood.com/quotes/')
+    return "https://api.robinhood.com/quotes/"
 
 
 def ratings_url(symbol):
-    return('https://api.robinhood.com/midlands/ratings/{0}/'.format(id_for_stock(symbol)))
+    return f"https://api.robinhood.com/midlands/ratings/{id_for_stock(symbol)}/"
 
 
 def splits_url(symbol):
-    return('https://api.robinhood.com/instruments/{0}/splits/'.format(id_for_stock(symbol)))
+    return f"https://api.robinhood.com/instruments/{id_for_stock(symbol)}/splits/"
+
 
 # account
 
+
 def phoenix_url():
-    return('https://phoenix.robinhood.com/accounts/unified')
+    return "https://phoenix.robinhood.com/accounts/unified"
+
 
 def positions_url(account_number=None):
     if account_number:
-        return('https://api.robinhood.com/positions/?account_number='+account_number)
+        return "https://api.robinhood.com/positions/?account_number=" + account_number
     else:
-        return('https://api.robinhood.com/positions/')
+        return "https://api.robinhood.com/positions/"
 
 
 def tax_lots_open_url(account_number, instrument_id):
-    return('https://api.robinhood.com/tax_lots/open/{0}/{1}/'.format(account_number, instrument_id))
+    return f"https://api.robinhood.com/tax_lots/open/{account_number}/{instrument_id}/"
 
 
 def tax_lots_selected_url(order_id):
-    return('https://api.robinhood.com/tax_lots/order/{0}/selected/'.format(order_id))
+    return f"https://api.robinhood.com/tax_lots/order/{order_id}/selected/"
 
 
 def tax_lots_closed_url(order_id):
-    return('https://api.robinhood.com/tax_lots/order/{0}/closed/'.format(order_id))
+    return f"https://api.robinhood.com/tax_lots/order/{order_id}/closed/"
+
 
 def banktransfers_url(direction=None):
-    if direction == 'received':
-        return('https://api.robinhood.com/ach/received/transfers/')
+    if direction == "received":
+        return "https://api.robinhood.com/ach/received/transfers/"
     else:
-        return('https://api.robinhood.com/ach/transfers/')
+        return "https://api.robinhood.com/ach/transfers/"
+
 
 def cardtransactions_url():
-   return('https://minerva.robinhood.com/history/transactions/')
+    return "https://minerva.robinhood.com/history/transactions/"
+
 
 def unifiedtransfers_url():
-   return('https://bonfire.robinhood.com/paymenthub/unified_transfers/')
+    return "https://bonfire.robinhood.com/paymenthub/unified_transfers/"
+
 
 def daytrades_url(account):
-    return('https://api.robinhood.com/accounts/{0}/recent_day_trades/'.format(account))
+    return f"https://api.robinhood.com/accounts/{account}/recent_day_trades/"
 
 
 def dividends_url():
-    return('https://api.robinhood.com/dividends/')
+    return "https://api.robinhood.com/dividends/"
 
 
 def documents_url():
-    return('https://api.robinhood.com/documents/')
+    return "https://api.robinhood.com/documents/"
+
 
 def withdrawl_url(bank_id):
-    return("https://api.robinhood.com/ach/relationships/{}/".format(bank_id))
+    return f"https://api.robinhood.com/ach/relationships/{bank_id}/"
+
 
 def linked_url(id=None, unlink=False):
     if unlink:
-        return('https://api.robinhood.com/ach/relationships/{0}/unlink/'.format(id))
+        return f"https://api.robinhood.com/ach/relationships/{id}/unlink/"
     if id:
-        return('https://api.robinhood.com/ach/relationships/{0}/'.format(id))
+        return f"https://api.robinhood.com/ach/relationships/{id}/"
     else:
-        return('https://api.robinhood.com/ach/relationships/')
+        return "https://api.robinhood.com/ach/relationships/"
 
 
 def margin_url():
-    return('https://api.robinhood.com/margin/calls/')
+    return "https://api.robinhood.com/margin/calls/"
 
 
 def margininterest_url():
-    return('https://api.robinhood.com/cash_journal/margin_interest_charges/')
+    return "https://api.robinhood.com/cash_journal/margin_interest_charges/"
 
 
 def notifications_url(tracker=False):
     if tracker:
-        return('https://api.robinhood.com/midlands/notifications/notification_tracker/')
+        return "https://api.robinhood.com/midlands/notifications/notification_tracker/"
     else:
-        return('https://api.robinhood.com/notifications/devices/')
+        return "https://api.robinhood.com/notifications/devices/"
 
 
 def referral_url():
-    return('https://api.robinhood.com/midlands/referral/')
+    return "https://api.robinhood.com/midlands/referral/"
 
 
 def stockloan_url():
-    return('https://api.robinhood.com/accounts/stock_loan_payments/')
+    return "https://api.robinhood.com/accounts/stock_loan_payments/"
+
 
 def interest_url():
-    return('https://api.robinhood.com/accounts/sweeps/')
+    return "https://api.robinhood.com/accounts/sweeps/"
+
 
 def subscription_url():
-    return('https://api.robinhood.com/subscription/subscription_fees/')
+    return "https://api.robinhood.com/subscription/subscription_fees/"
 
 
 def wiretransfers_url():
-    return('https://api.robinhood.com/wire/transfers')
+    return "https://api.robinhood.com/wire/transfers"
 
 
 def watchlists_url(name=None, add=False):
     if name:
-        return('https://api.robinhood.com/midlands/lists/items/')
+        return "https://api.robinhood.com/midlands/lists/items/"
     else:
-        return('https://api.robinhood.com/midlands/lists/default/')
+        return "https://api.robinhood.com/midlands/lists/default/"
 
 
 # markets
 
 
 def currency_url():
-    return('https://nummus.robinhood.com/currency_pairs/')
+    return "https://nummus.robinhood.com/currency_pairs/"
+
 
 def markets_url():
-    return('https://api.robinhood.com/markets/')
+    return "https://api.robinhood.com/markets/"
+
 
 def market_hours_url(market, date):
-    return('https://api.robinhood.com/markets/{}/hours/{}/'.format(market, date))
+    return f"https://api.robinhood.com/markets/{market}/hours/{date}/"
+
 
 def movers_sp500_url():
-    return('https://api.robinhood.com/midlands/movers/sp500/')
+    return "https://api.robinhood.com/midlands/movers/sp500/"
+
 
 def get_100_most_popular_url():
-    return('https://api.robinhood.com/midlands/tags/tag/100-most-popular/')
+    return "https://api.robinhood.com/midlands/tags/tag/100-most-popular/"
+
 
 def movers_top_url():
-    return('https://api.robinhood.com/midlands/tags/tag/top-movers/')
+    return "https://api.robinhood.com/midlands/tags/tag/top-movers/"
+
 
 def market_category_url(category):
-    return('https://api.robinhood.com/midlands/tags/tag/{}/'.format(category))
+    return f"https://api.robinhood.com/midlands/tags/tag/{category}/"
+
 
 # options
 
 
 def aggregate_url(account_number):
     if account_number:
-        return('https://api.robinhood.com/options/aggregate_positions/?account_numbers='+account_number)
+        return "https://api.robinhood.com/options/aggregate_positions/?account_numbers=" + account_number
     else:
-        return('https://api.robinhood.com/options/aggregate_positions/')
+        return "https://api.robinhood.com/options/aggregate_positions/"
 
 
 def chains_url(symbol):
-    return('https://api.robinhood.com/options/chains/{0}/'.format(id_for_chain(symbol)))
+    return f"https://api.robinhood.com/options/chains/{id_for_chain(symbol)}/"
 
 
 def option_historicals_url(id):
-    return('https://api.robinhood.com/marketdata/options/historicals/{0}/'.format(id))
+    return f"https://api.robinhood.com/marketdata/options/historicals/{id}/"
 
 
 def option_instruments_url(id=None):
     if id:
-        return('https://api.robinhood.com/options/instruments/{0}/'.format(id))
+        return f"https://api.robinhood.com/options/instruments/{id}/"
     else:
-        return('https://api.robinhood.com/options/instruments/')
+        return "https://api.robinhood.com/options/instruments/"
 
 
 def option_orders_url(orderID=None, account_number=None, start_date=None):
-    url = 'https://api.robinhood.com/options/orders/'
+    url = "https://api.robinhood.com/options/orders/"
     if orderID:
-        url += '{0}/'.format(orderID)
+        url += f"{orderID}/"
     query_build = []
     if account_number:
         query_build.append(f"account_numbers={account_number}")
@@ -254,83 +277,85 @@ def option_orders_url(orderID=None, account_number=None, start_date=None):
     return url
 
 
-
 def option_positions_url(account_number=None):
     if account_number:
-        return('https://api.robinhood.com/options/positions/?account_numbers='+account_number)
+        return "https://api.robinhood.com/options/positions/?account_numbers=" + account_number
     else:
-        return('https://api.robinhood.com/options/positions/')
+        return "https://api.robinhood.com/options/positions/"
 
 
 def marketdata_options_url():
-    return('https://api.robinhood.com/marketdata/options/')
+    return "https://api.robinhood.com/marketdata/options/"
+
 
 # pricebook
 
 
 def marketdata_index_quotes_url(id):
-    return ('https://api.robinhood.com/marketdata/indexes/values/v1/{0}/'.format(id))
+    return f"https://api.robinhood.com/marketdata/indexes/values/v1/{id}/"
 
 
 def marketdata_quotes_url(id):
-    return ('https://api.robinhood.com/marketdata/quotes/{0}/'.format(id))
+    return f"https://api.robinhood.com/marketdata/quotes/{id}/"
 
 
 def marketdata_pricebook_url(id):
-    return ('https://api.robinhood.com/marketdata/pricebook/snapshots/{0}/'.format(id))
+    return f"https://api.robinhood.com/marketdata/pricebook/snapshots/{id}/"
+
 
 # crypto
 
 
 def order_crypto_url():
-    return('https://nummus.robinhood.com/orders/')
+    return "https://nummus.robinhood.com/orders/"
 
 
 def crypto_account_url():
-    return('https://nummus.robinhood.com/accounts/')
+    return "https://nummus.robinhood.com/accounts/"
 
 
 def crypto_currency_pairs_url():
-    return('https://nummus.robinhood.com/currency_pairs/')
+    return "https://nummus.robinhood.com/currency_pairs/"
 
 
 def crypto_quote_url(id):
-    return('https://api.robinhood.com/marketdata/forex/quotes/{0}/'.format(id))
+    return f"https://api.robinhood.com/marketdata/forex/quotes/{id}/"
 
 
 def crypto_holdings_url():
-    return('https://nummus.robinhood.com/holdings/')
+    return "https://nummus.robinhood.com/holdings/"
 
 
 def crypto_historical_url(id):
-    return('https://api.robinhood.com/marketdata/forex/historicals/{0}/'.format(id))
+    return f"https://api.robinhood.com/marketdata/forex/historicals/{id}/"
 
 
 def crypto_orders_url(orderID=None):
     if orderID:
-        return('https://nummus.robinhood.com/orders/{0}/'.format(orderID))
+        return f"https://nummus.robinhood.com/orders/{orderID}/"
     else:
-        return('https://nummus.robinhood.com/orders/')
+        return "https://nummus.robinhood.com/orders/"
 
 
 def crypto_cancel_url(id):
-    return('https://nummus.robinhood.com/orders/{0}/cancel/'.format(id))
+    return f"https://nummus.robinhood.com/orders/{id}/cancel/"
+
 
 # orders
 
 
 def cancel_url(url):
-    return('https://api.robinhood.com/orders/{0}/cancel/'.format(url))
+    return f"https://api.robinhood.com/orders/{url}/cancel/"
 
 
 def option_cancel_url(id):
-    return('https://api.robinhood.com/options/orders/{0}/cancel/'.format(id))
+    return f"https://api.robinhood.com/options/orders/{id}/cancel/"
 
 
 def orders_url(orderID=None, account_number=None, start_date=None):
-    url = 'https://api.robinhood.com/orders/'
+    url = "https://api.robinhood.com/orders/"
     if orderID:
-        url += '{0}/'.format(orderID)
+        url += f"{orderID}/"
 
     query_build = []
     if account_number:
@@ -346,6 +371,7 @@ def orders_url(orderID=None, account_number=None, start_date=None):
                 url += "&" + value
 
     return url
+
 
 # futures
 
@@ -357,7 +383,7 @@ def futures_contract_url(symbol):
     :type symbol: str
     :returns: URL string
     """
-    return('https://api.robinhood.com/arsenal/v1/futures/contracts/symbol/{0}'.format(symbol))
+    return f"https://api.robinhood.com/arsenal/v1/futures/contracts/symbol/{symbol}"
 
 
 def futures_quotes_url():
@@ -365,7 +391,7 @@ def futures_quotes_url():
 
     :returns: URL string
     """
-    return('https://api.robinhood.com/marketdata/futures/quotes/v1/')
+    return "https://api.robinhood.com/marketdata/futures/quotes/v1/"
 
 
 def futures_orders_url(account_id):
@@ -375,7 +401,7 @@ def futures_orders_url(account_id):
     :type account_id: str
     :returns: URL string
     """
-    return('https://api.robinhood.com/ceres/v1/accounts/{0}/orders'.format(account_id))
+    return f"https://api.robinhood.com/ceres/v1/accounts/{account_id}/orders"
 
 
 def futures_account_url():
@@ -385,31 +411,32 @@ def futures_account_url():
 
     :returns: URL string
     """
-    return('https://api.robinhood.com/ceres/v1/accounts/')
+    return "https://api.robinhood.com/ceres/v1/accounts/"
 
 
 # recurring investments
+
 
 def recurring_schedules_url(account_number=None, schedule_id=None, asset_types=None):
     """URL for recurring investment schedules.
 
     Endpoint discovered through reverse engineering: bonfire.robinhood.com/recurring_schedules/
     """
-    base_url = 'https://bonfire.robinhood.com/recurring_schedules/'
+    base_url = "https://bonfire.robinhood.com/recurring_schedules/"
 
     if schedule_id:
-        return f'{base_url}{schedule_id}/'
+        return f"{base_url}{schedule_id}/"
     elif asset_types:
         if isinstance(asset_types, str):
             asset_types = [asset_types]
-        params = '&'.join([f'asset_types={at}' for at in asset_types])
-        return f'{base_url}?{params}'
+        params = "&".join([f"asset_types={at}" for at in asset_types])
+        return f"{base_url}?{params}"
     elif account_number:
-        return f'{base_url}?account_number={account_number}'
+        return f"{base_url}?account_number={account_number}"
     else:
         return base_url
 
 
 def next_investment_date_url(frequency, start_date):
     """URL for getting next investment date."""
-    return f'https://bonfire.robinhood.com/recurring_schedules/equity/next_investment_date/?frequency={frequency}&start_date={start_date}'
+    return f"https://bonfire.robinhood.com/recurring_schedules/equity/next_investment_date/?frequency={frequency}&start_date={start_date}"

@@ -1,4 +1,5 @@
 """Contains functions for getting all the information tied to a user account."""
+
 from robin_stocks.robinhood.helper import *
 from robin_stocks.robinhood.urls import *
 
@@ -67,10 +68,10 @@ def load_account_profile(account_number=None, info=None, dataType="indexzero"):
     """
     url = account_profile_url(account_number)
     if account_number is not None:
-         data = request_get(url)
+        data = request_get(url)
     else:
         data = request_get(url, dataType)
-    return(filter_data(data, info))
+    return filter_data(data, info)
 
 
 @login_required
@@ -101,7 +102,7 @@ def load_basic_profile(info=None):
     """
     url = basic_profile_url()
     data = request_get(url)
-    return(filter_data(data, info))
+    return filter_data(data, info)
 
 
 @login_required
@@ -136,7 +137,7 @@ def load_investment_profile(info=None):
     """
     url = investment_profile_url()
     data = request_get(url)
-    return(filter_data(data, info))
+    return filter_data(data, info)
 
 
 @login_required
@@ -177,8 +178,8 @@ def load_portfolio_profile(account_number=None, info=None):
     if account_number is not None:
         data = request_get(url)
     else:
-        data = request_get(url, 'indexzero')
-    return(filter_data(data, info))
+        data = request_get(url, "indexzero")
+    return filter_data(data, info)
 
 
 @login_required
@@ -211,7 +212,7 @@ def load_security_profile(info=None):
     """
     url = security_profile_url()
     data = request_get(url)
-    return(filter_data(data, info))
+    return filter_data(data, info)
 
 
 @login_required
@@ -239,4 +240,4 @@ def load_user_profile(info=None):
     """
     url = user_profile_url()
     data = request_get(url)
-    return(filter_data(data, info))
+    return filter_data(data, info)

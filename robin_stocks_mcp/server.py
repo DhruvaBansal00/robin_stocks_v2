@@ -19,26 +19,26 @@ from .runtime import set_config
 def _register_all_tools() -> None:
     # Importing each module registers its tools on the shared `mcp` instance.
     from .tools import (  # noqa: F401
-        robinhood_auth,
-        robinhood_account,
-        robinhood_profiles,
-        robinhood_stocks,
-        robinhood_options,
-        robinhood_crypto,
-        robinhood_futures,
-        robinhood_markets,
-        robinhood_orders,
-        robinhood_recurring,
-        robinhood_export,
-        tda_auth,
-        tda_account,
-        tda_stocks,
-        tda_markets,
-        tda_orders,
-        gemini_auth,
         gemini_account,
+        gemini_auth,
         gemini_crypto,
         gemini_orders,
+        robinhood_account,
+        robinhood_auth,
+        robinhood_crypto,
+        robinhood_export,
+        robinhood_futures,
+        robinhood_markets,
+        robinhood_options,
+        robinhood_orders,
+        robinhood_profiles,
+        robinhood_recurring,
+        robinhood_stocks,
+        tda_account,
+        tda_auth,
+        tda_markets,
+        tda_orders,
+        tda_stocks,
     )
 
 
@@ -48,8 +48,7 @@ def _cmd_serve(args: argparse.Namespace) -> int:
     bootstrap_login(cfg)
     _register_all_tools()
     print(
-        f"[robin_stocks_mcp] starting; transport={args.transport} "
-        f"read_only={cfg.read_only} auto_login={cfg.auto_login}",
+        f"[robin_stocks_mcp] starting; transport={args.transport} read_only={cfg.read_only} auto_login={cfg.auto_login}",
         file=sys.stderr,
     )
     mcp.run(transport=args.transport)
@@ -74,7 +73,7 @@ def _cmd_tda_setup(args: argparse.Namespace) -> int:
     print("client_id, an authorization_token, and a refresh_token.")
     if args.generate_passcode:
         passcode = tda.generate_encryption_passcode()
-        print(f"\nGenerated encryption passcode (save this — you'll need it on every run):")
+        print("\nGenerated encryption passcode (save this — you'll need it on every run):")
         print(f"  {passcode}\n")
     else:
         passcode = args.passcode or getpass.getpass("Encryption passcode: ")
@@ -116,17 +115,14 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     serve.set_defaults(func=_cmd_serve)
 
-    login_p = sub.add_parser(
-        "login", help="Interactive first-time Robinhood login (seeds the session file)."
-    )
+    login_p = sub.add_parser("login", help="Interactive first-time Robinhood login (seeds the session file).")
     login_p.add_argument("--username")
     login_p.add_argument("--password")
     login_p.add_argument("--mfa-code", dest="mfa_code")
     login_p.set_defaults(func=_cmd_login)
 
     tda_p = sub.add_parser("tda-setup", help="One-time TDA encrypted credential setup.")
-    tda_p.add_argument("--generate-passcode", action="store_true",
-                       help="Generate a fresh encryption passcode and print it.")
+    tda_p.add_argument("--generate-passcode", action="store_true", help="Generate a fresh encryption passcode and print it.")
     tda_p.add_argument("--passcode")
     tda_p.add_argument("--client-id", dest="client_id")
     tda_p.add_argument("--auth-token", dest="auth_token")

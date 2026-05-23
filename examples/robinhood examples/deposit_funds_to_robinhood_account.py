@@ -1,27 +1,28 @@
 import os
 
 import pyotp
-import robin_stocks.robinhood as r
 from dotenv import load_dotenv
-'''
+
+import robin_stocks.robinhood as r
+
+"""
 This is an example script that will deposit money to your robinhood
 account from the bank account of your choosing.
 
 NOTE: View the two_factor_log_in.py script to see how automatic
 two-factor loggin in works.
-'''
+"""
 ### REPLACE ME
 amount_to_deposit = "REPLACE-ME"
 ###
 # Load environment variables
 load_dotenv()
 # Login using two-factor code
-totp = pyotp.TOTP(os.environ['robin_mfa']).now()
-login = r.login(os.environ['robin_username'],
-                os.environ['robin_password'], store_session=True, mfa_code=totp)
+totp = pyotp.TOTP(os.environ["robin_mfa"]).now()
+login = r.login(os.environ["robin_username"], os.environ["robin_password"], store_session=True, mfa_code=totp)
 # Get the bank account information
 bank_accounts = r.get_linked_bank_accounts()
-account_names = r.filter_data(bank_accounts, 'bank_account_nickname')
+account_names = r.filter_data(bank_accounts, "bank_account_nickname")
 # set up default variable values for business logic
 count = 1
 valid_choice = False
@@ -33,21 +34,20 @@ if len(account_names) == 0:
 else:
     print("=====\navailable banks\n-----")
     for bank in account_names:
-        print("{0}. {1}".format(count, bank))
+        print(f"{count}. {bank}")
         count += 1
-    print("{0}. Cancel Deposit".format(count))
+    print(f"{count}. Cancel Deposit")
     print("-----")
     # Select a whole integer, if you select an invalid integer, code will prompt you again
     while not valid_choice:
         try:
-            bank_choice = input(
-                "Type in the number of the bank account you want to use below:\n")
+            bank_choice = input("Type in the number of the bank account you want to use below:\n")
             bank_choice = int(bank_choice)
             if bank_choice > 0 and bank_choice <= count:  # allowable limits are 1 to the max number in list
                 valid_choice = True
             else:
                 raise ValueError
-        except:
+        except Exception:
             # you could put the print statement outside the try-except block and have this
             # except have a simple 'pass' but then the "I'm sorry" statement would ALWAYS
             # print instead of printing only on failed entries. This is why I manually
@@ -61,7 +61,6 @@ if bank_choice == -1:
 elif bank_choice == count:
     print("you chose to cancel. Exiting...")
 else:
-    ach_relationship = bank_accounts[bank_choice - 1]['url']
-    deposit = r.deposit_funds_to_robinhood_account(
-        ach_relationship, amount_to_deposit)
+    ach_relationship = bank_accounts[bank_choice - 1]["url"]
+    deposit = r.deposit_funds_to_robinhood_account(ach_relationship, amount_to_deposit)
     print(deposit)

@@ -78,9 +78,7 @@ async def test_gem_cancel_all_active_orders_blocked_read_only(writes_disabled) -
 @pytest.mark.asyncio
 async def test_gem_withdraw_blocked_read_only(writes_disabled) -> None:
     with patch("robin_stocks.gemini.withdraw_crypto_funds") as m:
-        out = await get_fn("gem_withdraw_crypto_funds")(
-            address="addr", amount=1.0, currency="btc"
-        )
+        out = await get_fn("gem_withdraw_crypto_funds")(address="addr", amount=1.0, currency="btc")
         assert out["error"] is True
         m.assert_not_called()
 
