@@ -155,6 +155,21 @@ from .orders import (
     order_sell_tax_lot,
     order_sell_trailing_stop,
 )
+from .prediction_markets import (
+    cancel_event_contract_order,
+    get_event_contract,
+    get_event_contract_order_fees,
+    get_event_contract_order_info,
+    get_event_contract_orders,
+    get_event_contract_positions,
+    get_event_contracts_account_id,
+    get_prediction_market_categories,
+    get_prediction_market_event,
+    get_prediction_market_events,
+    get_prediction_market_node_id,
+    get_prediction_markets,
+    order_event_contract,
+)
 from .profiles import (
     load_account_profile,
     load_basic_profile,
