@@ -31,6 +31,7 @@ def _register_all_tools() -> None:
         robinhood_markets,
         robinhood_options,
         robinhood_orders,
+        robinhood_prediction_markets,
         robinhood_profiles,
         robinhood_recurring,
         robinhood_stocks,
