@@ -218,7 +218,12 @@ def login(
             if "verification_workflow" in data:
                 print("Verification required, handling challenge...")
                 workflow_id = data["verification_workflow"]["id"]
-                _validate_sherrif_id(device_token, workflow_id)
+                # Validate the device token that was actually sent in the login
+                # payload (a stored session's token when one exists) — not the
+                # freshly generated one. Validating the wrong token meant the
+                # user's approval never credited the reused device, so every
+                # password login re-challenged instead of being remembered.
+                _validate_sherrif_id(login_payload["device_token"], workflow_id)
 
                 # Reattempt login after verification
                 data = request_post(url, login_payload)
