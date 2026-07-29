@@ -73,6 +73,14 @@ Placing and Cancelling Orders
 .. automodule:: robin_stocks.robinhood.orders
    :members:
 
+Getting IPO Access Information
+------------------------------
+
+----
+
+.. automodule:: robin_stocks.robinhood.ipo
+   :members:
+
 Getting Crypto Information
 --------------------------
 

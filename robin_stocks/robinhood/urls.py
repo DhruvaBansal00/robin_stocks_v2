@@ -440,3 +440,48 @@ def recurring_schedules_url(account_number=None, schedule_id=None, asset_types=N
 def next_investment_date_url(frequency, start_date):
     """URL for getting next investment date."""
     return f"https://bonfire.robinhood.com/recurring_schedules/equity/next_investment_date/?frequency={frequency}&start_date={start_date}"
+
+
+# IPO Access
+#
+# Robinhood's IPO Access surface is served by bonfire.robinhood.com as a set of
+# view models (the same payloads the mobile/web app renders). Paths were read
+# out of the web app bundle at
+# cdn.robinhood.com/assets/generated_assets/webapp/App-*.js and verified against
+# a live authenticated session.
+
+
+def ipo_access_list_url():
+    """URL for the IPO Access list view model — the IPOs offered to this account."""
+    return "https://bonfire.robinhood.com/lists/ipo_access/view_model/"
+
+
+def ipo_access_cards_url(instrument_ids):
+    """URL for the IPO Access cards of specific instruments.
+
+    :param instrument_ids: One instrument id, or an iterable of them.
+    """
+    if isinstance(instrument_ids, str):
+        instrument_ids = [instrument_ids]
+    return f"https://bonfire.robinhood.com/lists/ipo_access/cards/?ids={','.join(instrument_ids)}"
+
+
+def ipo_access_summary_url(instrument_id):
+    """URL for an IPO's summary view model (company, dates, price range)."""
+    return f"https://bonfire.robinhood.com/equity_trading/ipo_access/viewmodels/summary/{instrument_id}/"
+
+
+def ipo_access_order_entry_url(instrument_id, account_number=None):
+    """URL for an IPO's order-entry view model (quote, buying power, eligibility)."""
+    base = f"https://bonfire.robinhood.com/equity_trading/ipo_access/viewmodels/web_order_entry/{instrument_id}/"
+    return f"{base}?account_number={account_number}" if account_number else base
+
+
+def ipo_access_allocation_results_url(instrument_id):
+    """URL for the allocation results of an IPO you placed an order in."""
+    return f"https://bonfire.robinhood.com/equity_trading/ipo_access/viewmodels/allocation_results/{instrument_id}/"
+
+
+def ipo_access_trade_receipt_url(order_id):
+    """URL for the trade receipt of a filled IPO Access order."""
+    return f"https://bonfire.robinhood.com/equity_trading/ipo_access/viewmodels/trade_receipt/{order_id}/"
