@@ -414,6 +414,89 @@ def futures_account_url():
     return "https://api.robinhood.com/ceres/v1/accounts/"
 
 
+# prediction markets (event contracts)
+
+
+def prediction_markets_navigation_url():
+    """Get prediction-market navigation nodes (categories) endpoint.
+
+    :returns: URL string
+    """
+    return "https://api.robinhood.com/prediction-markets/v1/navigation_nodes"
+
+
+def prediction_markets_events_url():
+    """Get prediction-market events listing endpoint.
+
+    :returns: URL string
+    """
+    return "https://api.robinhood.com/prediction-markets/v1/events"
+
+
+def prediction_markets_layout_url():
+    """Get prediction-market layout endpoint (markets shown under a category node).
+
+    :returns: URL string
+    """
+    return "https://api.robinhood.com/prediction-markets/v1/layout"
+
+
+def prediction_markets_event_url(event_id):
+    """Get prediction-market event details endpoint.
+
+    :param event_id: Event ID
+    :type event_id: str
+    :returns: URL string
+    """
+    return f"https://api.robinhood.com/prediction-markets/v1/events/{event_id}"
+
+
+def event_contract_url(contract_id):
+    """Get event-contract details endpoint.
+
+    :param contract_id: Event contract ID
+    :type contract_id: str
+    :returns: URL string
+    """
+    return f"https://api.robinhood.com/prediction-markets/v1/events/contracts/{contract_id}"
+
+
+def event_contract_positions_url(account_id):
+    """Get event-contract positions endpoint.
+
+    :param account_id: Derivatives (SWAP) account ID
+    :type account_id: str
+    :returns: URL string
+    """
+    return f"https://api.robinhood.com/ceres/v1/accounts/{account_id}/positions"
+
+
+def event_contract_fees_url():
+    """Get the fees-for-tentative-order endpoint (preview fees, places no order).
+
+    :returns: URL string
+    """
+    return "https://api.robinhood.com/ceres/v1/accounts/fees_for_tentative_order"
+
+
+def event_contract_orders_url():
+    """Get the event-contract order creation endpoint.
+
+    :returns: URL string
+    """
+    return "https://api.robinhood.com/ceres/v1/event_contract_orders"
+
+
+def event_contract_cancel_url(order_id):
+    """Get the event-contract order cancel endpoint.
+
+    :param order_id: Event contract order ID
+    :type order_id: str
+    :returns: URL string
+    """
+    return f"https://api.robinhood.com/ceres/v1/event_contract_orders/{order_id}/cancel"
+
+
 # recurring investments
 
 
